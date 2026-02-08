@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Mobile app that detects when a child under 13 touches/uses the phone, recognizes the child via biometrics, and triggers an alert/ringing.",
+  "architectural_notes": [
+    "Use device biometric authentication/face recognition capabilities (where available) to identify the child and trigger an audible alert when detected."
+  ],
+  "known_issues": [
+    "Biometric identification for children and apps targeting under-13 may have significant platform/policy/privacy constraints; requirements may need adjustment based on OS capabilities and child privacy regulations."
+  ],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Minimal alarm bell app icon, flat vector style, high contrast (alarm-bell-icon.dim_512x512.png)\n- Simple illustration of a phone with an alert wave/ring effect, clean minimal style (phone-alert-illustration.dim_1200x600.png)",
+  "existing_features": [
+    {
+      "id": "feature-build-a-web-app-that-triggers-a-loud-on-screen-alarm-ringing-state-when-a-child-accesses-the-app-and-logs-each-access-event-timestamp-identified-child-profile-for-a-parent-guardian-to-review",
+      "title": "Build a web app that triggers a loud on-screen alarm/ringing state when a child accesses the app, and logs each access event (timestamp + identified child profile) for a parent/guardian to review.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-identity-recognition-using-internet-identity-webauthn-as-the-authentication-mechanism-and-map-authenticated-principals-to-child-profiles-created-by-the-guardian-no-collection-or-storage-of-biometric-data",
+      "title": "Implement identity recognition using Internet Identity (WebAuthn) as the authentication mechanism, and map authenticated principals to child profiles created by the guardian (no collection or storage of biometric data).",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-provide-a-guardian-dashboard-to-manage-child-profiles-create-rename-archive-and-link-unlink-each-profile-to-an-internet-identity-principal",
+      "title": "Provide a guardian dashboard to manage child profiles (create, rename, archive) and link/unlink each profile to an Internet Identity principal.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-guardian-only-control-to-stop-acknowledge-an-active-alarm-using-a-simple-guardian-pin-stored-securely-in-backend-state-hashed-and-verified-server-side",
+      "title": "Add a guardian-only control to stop/acknowledge an active alarm using a simple guardian PIN stored securely in backend state (hashed) and verified server-side.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-define-a-clear-consistent-visual-theme-for-the-app-colors-typography-spacing-layout-suitable-for-a-safety-alert-product-avoiding-blue-purple-as-primary-colors-and-apply-it-across-all-screens",
+      "title": "Define a clear, consistent visual theme for the app (colors, typography, spacing, layout) suitable for a safety/alert product, avoiding blue/purple as primary colors, and apply it across all screens.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-core-screens-in-the-react-ui-1-landing-sign-in-2-guardian-dashboard-profiles-logs-3-alarm-screen-state-and-wire-them-to-backend-apis-with-react-query",
+      "title": "Create core screens in the React UI: (1) Landing/sign-in, (2) Guardian dashboard (profiles + logs), (3) Alarm screen/state, and wire them to backend APIs with React Query.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-in-app-limitations-privacy-page-in-english-that-explains-this-is-a-web-app-it-cannot-detect-raw-phone-touches-it-does-not-collect-biometrics-and-it-is-intended-for-guardian-managed-use-for-children-under-13",
+      "title": "Add an in-app “Limitations & Privacy” page in English that explains: this is a web app, it cannot detect raw phone touches, it does not collect biometrics, and it is intended for guardian-managed use for children under 13.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-include-required-static-images-icon-simple-illustration-in-the-frontend-and-use-them-in-the-ui-e-g-app-icon-in-header-illustration-on-landing-store-them-under-frontend-public-assets-generated",
+      "title": "Generate and include required static images (icon + simple illustration) in the frontend and use them in the UI (e.g., app icon in header, illustration on landing). Store them under frontend/public/assets/generated.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Build an app that detects when a child (under 13) touches/uses the phone, identifies the child via biometrics, and rings/alerts on detection.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Implement Motoko backend APIs and stable storage for: guardian PIN hash, child profiles, principal-to-profile links, and access/alarm event logs.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Child Access Alert Web App (Internet Identity login + alarm)",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

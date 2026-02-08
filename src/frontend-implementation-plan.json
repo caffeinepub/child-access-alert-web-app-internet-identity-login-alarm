@@ -1,0 +1,269 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Child Access Alert Web App (React frontend: Internet Identity + alarm + guardian dashboard)",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Add alarm UI state and access-event log viewing, backed by React Query calls to persistent backend storage.",
+      "acceptanceCriteria": [
+        "A guardian can view a list of access events with time and which child profile was identified.",
+        "When an access event is triggered, the UI enters an alarm state with a prominent visual indicator and audible alarm that can be stopped by the guardian PIN (see REQ-4).",
+        "Access events persist across reloads (stored in the Motoko backend)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Alarm.tsx",
+          "operation": "create",
+          "description": "Create the alarm screen that polls alarm status via React Query and plays a looping audible alarm while active; include a PIN entry flow that calls backend verification + acknowledge to stop the alarm. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.tsx",
+          "operation": "create",
+          "description": "Create the guardian dashboard page with an access-event log list (timestamp + linked child profile) using React Query against backend log-reading capability; include loading/error UI states. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/queries/useAlarm.ts",
+          "operation": "create",
+          "description": "Add React Query hooks for alarm-related backend capabilities (read active state, trigger simulated access, acknowledge) and ensure cache invalidation when alarm is acknowledged. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/queries/useAlarmEvents.ts",
+          "operation": "create",
+          "description": "Add React Query hooks for fetching alarm/access event logs and refreshing them after simulated trigger/acknowledge actions. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "create",
+          "description": "Wire the Alarm and Dashboard screens into the app navigation/routing and ensure the UI can transition into alarm state after a simulated access trigger. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Implement Internet Identity sign-in UI and map authenticated principals to guardian-managed child profiles without collecting biometrics.",
+      "acceptanceCriteria": [
+        "Users authenticate via Internet Identity; the app never asks for or stores biometric scans/images/templates.",
+        "After successful login, the backend associates the caller principal with an existing child profile (or prompts the guardian to link it).",
+        "The UI clearly labels this as “Secure sign-in (Internet Identity)” in English."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Auth/LoginButton.tsx",
+          "operation": "create",
+          "description": "Create a login/logout button using the existing Internet Identity hook; label the sign-in section as “Secure sign-in (Internet Identity)” and clear React Query cache on logout per the authorization component guidance. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Auth/ProfileSetupModal.tsx",
+          "operation": "create",
+          "description": "Add a modal to collect and save a human-friendly user name via getCallerUserProfile/saveCallerUserProfile (first-login only), avoiding display of principal IDs. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/queries/useCurrentUser.ts",
+          "operation": "create",
+          "description": "Add React Query hooks for getCallerUserProfile, saveCallerUserProfile, getCallerUserRole, and isCallerAdmin; ensure queries are enabled only once an actor is available and handle authorization failures gracefully. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/Landing.tsx",
+          "operation": "create",
+          "description": "Create the landing/sign-in screen that uses Internet Identity sign-in, shows whether the current principal is linked to a child profile (via backend capability), and provides guardian linking prompts when appropriate (without referencing biometrics). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add an authenticated-app shell that requires Internet Identity login before showing any application data, and wire Landing/ProfileSetup flows into navigation. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Provide guardian dashboard UI to create/rename/archive child profiles and link/unlink principals to profiles.",
+      "acceptanceCriteria": [
+        "Guardian can create a child profile with a display name.",
+        "Guardian can link a logged-in principal to a selected child profile and later unlink it.",
+        "Archived profiles no longer trigger alarms but remain visible in a separate archived section."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Guardian/ChildProfilesManager.tsx",
+          "operation": "create",
+          "description": "Build the profiles management UI (create, rename, archive) and show active vs archived sections; all data actions use React Query mutations. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Guardian/PrincipalLinkingPanel.tsx",
+          "operation": "create",
+          "description": "Add UI to link/unlink an Internet Identity principal to a selected child profile using backend linking capabilities; include clear warnings that no biometrics are collected. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/queries/useChildProfiles.ts",
+          "operation": "create",
+          "description": "Add React Query hooks for listing profiles and mutations for create/rename/archive; invalidate relevant queries on success. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/queries/usePrincipalLinks.ts",
+          "operation": "create",
+          "description": "Add React Query hooks for reading the linked child profile for the current principal and mutations for link/unlink; ensure proper loading/error states. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.tsx",
+          "operation": "modify",
+          "description": "Wire ChildProfilesManager and PrincipalLinkingPanel into the guardian dashboard and guard these sections behind an admin/guardian check using role queries. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Add guardian PIN UI to set/change PIN and to acknowledge/stop an active alarm with server-side verification.",
+      "acceptanceCriteria": [
+        "Alarm cannot be stopped without entering the correct PIN.",
+        "PIN verification is performed by the backend (frontend does not contain the PIN or bypass logic).",
+        "Guardian can set or change the PIN after authenticating as guardian."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Guardian/GuardianPinSettings.tsx",
+          "operation": "create",
+          "description": "Create a guardian-only settings panel to set/change the guardian PIN using backend capability; do not store the PIN client-side beyond the input field. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Alarm/PinAcknowledgeForm.tsx",
+          "operation": "create",
+          "description": "Create a reusable PIN form used by the Alarm screen that calls backend verifyGuardianPin and then acknowledgeAlarm only on success; show error state on incorrect PIN. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/queries/useGuardianPin.ts",
+          "operation": "create",
+          "description": "Add React Query mutations for setGuardianPin and verifyGuardianPin; ensure errors are surfaced and guard these actions behind an admin/guardian check in UI. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.tsx",
+          "operation": "modify",
+          "description": "Add the GuardianPinSettings section to the dashboard (guardian-only) and ensure it is not shown to non-guardian users. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/Alarm.tsx",
+          "operation": "modify",
+          "description": "Require correct PIN verification before allowing alarm acknowledgement and stopping audio; ensure no UI-only bypass. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Apply a consistent safety/alert visual theme (non-blue/purple primary) across screens, with a distinct high-contrast alarm look.",
+      "acceptanceCriteria": [
+        "All pages share consistent typography, button styling, and spacing rules.",
+        "The alarm state has a distinct high-contrast look that differs clearly from normal state.",
+        "Primary colors are not blue/purple."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "create",
+          "description": "Define global theme tokens (Tailwind/CSS variables) for a safety/alert palette (e.g., red/orange/black/white) and consistent typography/spacing; avoid blue/purple as primary. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Adjust Tailwind theme mappings to ensure primary/destructive/accent colors align with the non-blue/purple safety theme tokens. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/layout/AppShell.tsx",
+          "operation": "create",
+          "description": "Create a shared layout wrapper (header/nav/content/footer) that applies consistent spacing and typography across all screens. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/Alarm.tsx",
+          "operation": "modify",
+          "description": "Ensure the alarm state uses a distinct, high-contrast visual treatment consistent with the theme (separate from normal pages). Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Create and wire core React screens (Landing/sign-in, Guardian dashboard, Alarm state) using React Query with loading/error states.",
+      "acceptanceCriteria": [
+        "A user can navigate between landing, dashboard, and logs without page errors.",
+        "Alarm screen/state is reachable by a simulated “child access detected” action (since true phone-touch detection is not available in a web app).",
+        "All backend calls are handled via React Query with loading and error states."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Implement app-level navigation/routing among Landing, Dashboard, Alarm, and Limitations & Privacy, and ensure navigation is not broken when unauthenticated. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/Landing.tsx",
+          "operation": "modify",
+          "description": "Add a simulated “child access detected” action that triggers alarm via backend capability and navigates/updates UI to the alarm screen/state; include React Query loading/error handling. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.tsx",
+          "operation": "modify",
+          "description": "Ensure dashboard page includes both profiles management and logs, with React Query-driven loading/error states across all backend calls. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useActor.ts",
+          "operation": "modify",
+          "description": "Ensure actor availability and identity changes correctly trigger React Query invalidation/refetch patterns for all dependent queries, supporting smooth navigation across screens. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Add a Limitations & Privacy page in English and link it from main navigation/footer.",
+      "acceptanceCriteria": [
+        "The page is accessible from the main navigation/footer.",
+        "The page explicitly states that biometric data is not collected/stored and that Internet Identity may use device authentication.",
+        "The page explains that real device-level touch detection requires native OS features not available to this web app."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/LimitationsPrivacy.tsx",
+          "operation": "create",
+          "description": "Create an English “Limitations & Privacy” page covering: web-only constraints, no raw touch detection, no biometric collection/storage, and guardian-managed intended use for children under 13. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/layout/AppShell.tsx",
+          "operation": "modify",
+          "description": "Add a navigation/footer link to the “Limitations & Privacy” page from the main app shell. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire the Limitations & Privacy page into app navigation/routing so it is reachable from the main UI. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "summary": "Add required generated static images under frontend/public/assets/generated and reference them in the UI.",
+      "acceptanceCriteria": [
+        "Generated images exist under frontend/public/assets/generated and are referenced by the UI.",
+        "Images render correctly in the landing and dashboard pages without backend involvement."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/alarm-bell-icon.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated app icon asset at frontend/public/assets/generated/alarm-bell-icon.dim_512x512.png for use in header/app chrome."
+        },
+        {
+          "path": "frontend/public/assets/generated/phone-alert-illustration.dim_1200x600.png",
+          "operation": "create",
+          "description": "Add the generated landing illustration asset at frontend/public/assets/generated/phone-alert-illustration.dim_1200x600.png for use on the landing/sign-in screen."
+        },
+        {
+          "path": "frontend/src/components/layout/AppShell.tsx",
+          "operation": "modify",
+          "description": "Reference frontend/public/assets/generated/alarm-bell-icon.dim_512x512.png in the header (e.g., brand mark) as a static asset. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/Landing.tsx",
+          "operation": "modify",
+          "description": "Reference frontend/public/assets/generated/phone-alert-illustration.dim_1200x600.png on the landing page as a static asset (no backend involvement). Verify the component's usage instructions before implementing."
+        }
+      ]
+    }
+  ]
+}

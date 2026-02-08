@@ -1,0 +1,190 @@
+{
+  "kind": "build_request",
+  "title": "Child Access Alert Web App (Internet Identity login + alarm)",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Build a web app that triggers a loud on-screen alarm/ringing state when a child accesses the app, and logs each access event (timestamp + identified child profile) for a parent/guardian to review.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Create a app that rings when kids touches phone ,app will recognize the kid by biometric ,this for below 13years"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A guardian can view a list of access events with time and which child profile was identified.",
+        "When an access event is triggered, the UI enters an alarm state with a prominent visual indicator and audible alarm that can be stopped by the guardian PIN (see REQ-4).",
+        "Access events persist across reloads (stored in the Motoko backend)."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Implement identity recognition using Internet Identity (WebAuthn) as the authentication mechanism, and map authenticated principals to child profiles created by the guardian (no collection or storage of biometric data).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "app will recognize the kid by biometric"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Users authenticate via Internet Identity; the app never asks for or stores biometric scans/images/templates.",
+        "After successful login, the backend associates the caller principal with an existing child profile (or prompts the guardian to link it).",
+        "The UI clearly labels this as “Secure sign-in (Internet Identity)” in English."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Provide a guardian dashboard to manage child profiles (create, rename, archive) and link/unlink each profile to an Internet Identity principal.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "this for below 13years"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Guardian can create a child profile with a display name.",
+        "Guardian can link a logged-in principal to a selected child profile and later unlink it.",
+        "Archived profiles no longer trigger alarms but remain visible in a separate archived section."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Add a guardian-only control to stop/acknowledge an active alarm using a simple guardian PIN stored securely in backend state (hashed) and verified server-side.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "rings when kids touches phone"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Alarm cannot be stopped without entering the correct PIN.",
+        "PIN verification is performed by the backend (frontend does not contain the PIN or bypass logic).",
+        "Guardian can set or change the PIN after authenticating as guardian."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Define a clear, consistent visual theme for the app (colors, typography, spacing, layout) suitable for a safety/alert product, avoiding blue/purple as primary colors, and apply it across all screens.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All pages share consistent typography, button styling, and spacing rules.",
+        "The alarm state has a distinct high-contrast look that differs clearly from normal state.",
+        "Primary colors are not blue/purple."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Create core screens in the React UI: (1) Landing/sign-in, (2) Guardian dashboard (profiles + logs), (3) Alarm screen/state, and wire them to backend APIs with React Query.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A user can navigate between landing, dashboard, and logs without page errors.",
+        "Alarm screen/state is reachable by a simulated “child access detected” action (since true phone-touch detection is not available in a web app).",
+        "All backend calls are handled via React Query with loading and error states."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Implement Motoko backend APIs and stable storage for: guardian PIN hash, child profiles, principal-to-profile links, and access/alarm event logs.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Data persists across canister upgrades via stable variables (or equivalent stable storage pattern).",
+        "Backend exposes query/update methods for CRUD on profiles, linking principals, setting/verifying PIN, and appending/fetching logs.",
+        "All write operations validate caller authorization (guardian-only where applicable)."
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Add an in-app “Limitations & Privacy” page in English that explains: this is a web app, it cannot detect raw phone touches, it does not collect biometrics, and it is intended for guardian-managed use for children under 13.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "app will recognize the kid by biometric"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The page is accessible from the main navigation/footer.",
+        "The page explicitly states that biometric data is not collected/stored and that Internet Identity may use device authentication.",
+        "The page explains that real device-level touch detection requires native OS features not available to this web app."
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Generate and include required static images (icon + simple illustration) in the frontend and use them in the UI (e.g., app icon in header, illustration on landing). Store them under frontend/public/assets/generated.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Generated images exist under frontend/public/assets/generated and are referenced by the UI.",
+        "Images render correctly in the landing and dashboard pages without backend involvement."
+      ]
+    }
+  ],
+  "constraints": [
+    "Implement as an Internet Computer canister app using Motoko backend and React+TypeScript frontend.",
+    "Respect single-actor backend architecture (all Motoko logic in one main actor).",
+    "Do not edit files under frontend immutable paths (compose UI using existing components instead).",
+    "Do not collect, store, or process biometric data; use Internet Identity/WebAuthn authentication only.",
+    "No native mobile OS hooks: do not claim or attempt true phone-touch detection or background monitoring."
+  ],
+  "nonGoals": [
+    "Building a native iOS/Android app.",
+    "Using platform biometrics APIs directly (Face ID/Touch ID templates) or performing biometric recognition within the app.",
+    "Continuous background monitoring of device touches or triggering alarms outside the browser/tab.",
+    "Collecting child age or personal data beyond a guardian-chosen display name."
+  ],
+  "imageRequirements": {
+    "required": [
+      "Minimal alarm bell app icon, flat vector style, high contrast (alarm-bell-icon.dim_512x512.png)",
+      "Simple illustration of a phone with an alert wave/ring effect, clean minimal style (phone-alert-illustration.dim_1200x600.png)"
+    ],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [
+      "Build a child access alert app for guardian-managed use for children under 13"
+    ],
+    "goalsToRemove": [],
+    "preferencesToAdd": [
+      "User-facing text must be in English"
+    ],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-08T06:09:43.340Z",
+  "summary": "The diff adds a Motoko backend actor plus a React+TS frontend with routing, Internet Identity login hook, React Query data hooks, guardian dashboard components (profiles, logs, PIN settings, principal linking), and alarm navigation behavior. However, several key requirements are either not evidenced (due to truncation/omissions) or appear not fully implemented (notably stable persistence and secure PIN hashing/server-side enforcement).",
+  "missing_requirements": [
+    {
+      "id": "REQ-7",
+      "requirement": "Data persists across canister upgrades via stable variables (or equivalent stable storage pattern) for guardian PIN hash, child profiles, principal-to-profile links, and event logs.",
+      "reason": "Backend state is defined with non-stable `var`/`let` bindings and there is no evidence of a stable storage pattern (e.g., `stable var` + `preupgrade/postupgrade`).",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Guardian PIN stored securely hashed in backend state and verified server-side; alarm cannot be stopped without correct PIN.",
+      "reason": "Backend explicitly stores the PIN as-is: `guardianPinHash := ?pin;` and compares plaintext. This is not hashed storage. Also no evidence that `acknowledgeAlarm` is gated server-side by a successful PIN verification (frontend calls `verifyGuardianPin` then calls `acknowledgeAlarm`, but backend enforcement is not shown).",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/components/Alarm/PinAcknowledgeForm.tsx",
+        "frontend/src/hooks/queries/useAlarm.ts",
+        "frontend/src/hooks/queries/useGuardianPin.ts"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "UI clearly labels authentication as “Secure sign-in (Internet Identity)” in English.",
+      "reason": "Login button text is “Secure Sign-in” (missing the explicit “(Internet Identity)” portion).",
+      "evidence": [
+        "frontend/src/components/Auth/LoginButton.tsx"
+      ]
+    },
+    {
+      "id": "REQ-1",
+      "requirement": "When an access event is triggered, the UI enters an alarm state with a prominent visual indicator and audible alarm.",
+      "reason": "An alarm route and PIN acknowledge form exist, but the diff summary does not include the Alarm page implementation or any audible alarm logic, so the audible/visual alarm behavior is not evidenced.",
+      "evidence": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/Alarm/PinAcknowledgeForm.tsx",
+        "frontend/src/hooks/queries/useAlarm.ts",
+        "frontend/src/components/layout/AppShell.tsx"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "requirement": "Limitations & Privacy page content in English explaining web limitations (no raw phone touch detection), no biometric collection/storage, and intended guardian-managed use for children under 13.",
+      "reason": "A route/page is added, but the content of `LimitationsPrivacy` is not shown in the diff summary, so required statements are not evidenced.",
+      "evidence": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/layout/AppShell.tsx"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Admin token initialization via a secret URL parameter (`caffeineAdminToken`) and custom access control initialization on the actor.",
+      "reason": "The BuildRequest does not mention an admin secret token via URL parameters or a separate access-control initialization flow; it only specifies guardian-only authorization.",
+      "evidence": [
+        "frontend/src/hooks/useActor.ts"
+      ]
+    },
+    {
+      "description": "Custom authorization mixin/access-control framework and a separate `UserProfile` concept with permissions checks unrelated to the requested child-profile model.",
+      "reason": "The BuildRequest focuses on guardian PIN, child profiles, principal links, and event logs; it does not request an additional user-permission system or a `UserProfile` store with roles in the backend.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    }
+  ],
+  "confidence": 0.66,
+  "changed_files": [
+    "all_files_summary.json",
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/index.css",
+    "frontend/index.html",
+    "frontend/src/App.tsx",
+    "frontend/src/components/Alarm/PinAcknowledgeForm.tsx",
+    "frontend/src/components/Auth/LoginButton.tsx",
+    "frontend/src/components/Auth/ProfileSetupModal.tsx",
+    "frontend/src/components/Guardian/AlarmEventLog.tsx",
+    "frontend/src/components/Guardian/ChildProfilesManager.tsx",
+    "frontend/src/components/Guardian/GuardianPinSettings.tsx",
+    "frontend/src/components/Guardian/PrincipalLinkingPanel.tsx",
+    "frontend/src/components/layout/AppShell.tsx",
+    "frontend/src/hooks/queries/useAlarm.ts",
+    "frontend/src/hooks/queries/useAlarmEvents.ts",
+    "frontend/src/hooks/queries/useChildProfiles.ts",
+    "frontend/src/hooks/queries/useCurrentUser.ts",
+    "frontend/src/hooks/queries/useGuardianPin.ts",
+    "frontend/src/hooks/queries/usePrincipalLinks.ts",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/index.css",
+    "frontend/src/main.tsx",
+    "frontend/src/pages/Alarm.tsx",
+    "frontend/src/pages/Dashboard.tsx",
+    "frontend/src/pages/Landing.tsx",
+    "frontend/src/pages/LimitationsPrivacy.tsx",
+    "frontend/src/utils/urlParams.ts",
+    "frontend/tailwind.config.js",
+    "project_state.json"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "frontend/src/App.tsx": "Main application component with TanStack Router setup, routing between Landing, Dashboard, Alarm, and Limitations pages, and profile setup modal integration with theme provider (fixed React Hooks rules violation by extracting component function).",
+  "frontend/src/components/layout/AppShell.tsx": "Application shell layout component with header (logo, navigation, login button), main content outlet, footer with attribution, and automatic alarm navigation.",
+  "frontend/src/components/Auth/LoginButton.tsx": "Login/logout button component using Internet Identity with loading states and query cache clearing on logout.",
+  "frontend/src/components/Auth/ProfileSetupModal.tsx": "Modal dialog for first-time user profile setup, collecting guardian name and saving to backend.",
+  "frontend/src/pages/Landing.tsx": "Landing page with feature showcase for unauthenticated users, and dashboard/alarm trigger actions for authenticated users based on their role and linked profile status (fixed Tailwind CSS v3 migration warnings).",
+  "frontend/src/pages/Dashboard.tsx": "Guardian dashboard with tabbed interface for managing child profiles, linking principals, viewing event logs, and configuring PIN settings (guardian-only access).",
+  "frontend/src/pages/Alarm.tsx": "Alarm screen with high-contrast visual design, audible alarm using Web Audio API, and PIN entry form to acknowledge and stop the alarm.",
+  "frontend/src/pages/LimitationsPrivacy.tsx": "Information page explaining web app limitations, privacy practices, no biometric data collection, and intended use for children under 13.",
+  "frontend/src/components/Guardian/ChildProfilesManager.tsx": "Component for creating, renaming, and archiving child profiles with active and archived sections.",
+  "frontend/src/components/Guardian/PrincipalLinkingPanel.tsx": "Component for linking and unlinking Internet Identity principals to child profiles with privacy notice.",
+  "frontend/src/components/Guardian/GuardianPinSettings.tsx": "Component for setting or changing the guardian PIN with confirmation and validation.",
+  "frontend/src/components/Guardian/AlarmEventLog.tsx": "Component displaying chronological list of access events with timestamps, child names, and acknowledgment status.",
+  "frontend/src/components/Alarm/PinAcknowledgeForm.tsx": "Form component for PIN entry and verification to acknowledge and stop active alarms.",
+  "frontend/src/hooks/queries/useCurrentUser.ts": "React Query hooks for user profile operations (get, save) and role checking (admin status).",
+  "frontend/src/hooks/queries/useChildProfiles.ts": "React Query hooks for child profile CRUD operations (list, create, rename, archive).",
+  "frontend/src/hooks/queries/usePrincipalLinks.ts": "React Query hooks for linking and unlinking principals to child profiles and fetching linked profile.",
+  "frontend/src/hooks/queries/useAlarm.ts": "React Query hooks for alarm operations (check status, trigger, acknowledge) with polling for active status.",
+  "frontend/src/hooks/queries/useAlarmEvents.ts": "React Query hook for fetching alarm event log from backend.",
+  "frontend/src/hooks/queries/useGuardianPin.ts": "React Query mutations for setting and verifying guardian PIN.",
+  "frontend/src/index.css": "Global styles with OKLCH-based color system using black/white/red theme for safety/alert aesthetic, avoiding blue/purple colors."
+}
