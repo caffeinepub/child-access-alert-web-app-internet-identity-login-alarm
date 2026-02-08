@@ -1,12 +1,12 @@
 {
-  "frontend/src/App.tsx": "Main application component with TanStack Router setup, routing between Landing, Dashboard, Alarm, and Limitations pages, and profile setup modal integration with theme provider (fixed React Hooks rules violation by extracting component function).",
-  "frontend/src/components/layout/AppShell.tsx": "Application shell layout component with header (logo, navigation, login button), main content outlet, footer with attribution, and automatic alarm navigation.",
+  "frontend/src/App.tsx": "Main application component with TanStack Router setup, routing between Landing, Dashboard, Alarm, and Limitations pages, profile setup modal integration, theme provider, and SPA deep-link recovery logic that detects redirect parameters and navigates to intended routes.",
+  "frontend/src/components/layout/AppShell.tsx": "Application shell layout component with header (updated branding to \"Child Access Control\", logo, navigation, login button), main content outlet, footer with attribution, and automatic alarm navigation.",
   "frontend/src/components/Auth/LoginButton.tsx": "Login/logout button component using Internet Identity with loading states and query cache clearing on logout.",
   "frontend/src/components/Auth/ProfileSetupModal.tsx": "Modal dialog for first-time user profile setup, collecting guardian name and saving to backend.",
   "frontend/src/pages/Landing.tsx": "Landing page with feature showcase for unauthenticated users, updated marketing copy reflecting privacy-preserving authentication, and dashboard/alarm trigger actions for authenticated users based on their role.",
   "frontend/src/pages/Dashboard.tsx": "Guardian dashboard with five-tab interface (Profiles, Records, Link Accounts, Event Logs, Settings) including the new BiometricRecordsManager tab with guardian-only access control.",
   "frontend/src/pages/Alarm.tsx": "Alarm screen with high-contrast visual design, audible alarm using Web Audio API, and PIN entry form to acknowledge and stop the alarm.",
-  "frontend/src/pages/LimitationsPrivacy.tsx": "Information page explaining web app limitations, privacy practices, guardian-managed biometric/touch-sensing record storage, no device biometric capture, and intended use for children under 13.",
+  "frontend/src/pages/LimitationsPrivacy.tsx": "Information page explaining web app limitations, privacy practices, guardian-managed biometric/touch-sensing record storage (numeric samples collected within app UI), no device biometric capture, and intended use for children under 13.",
   "frontend/src/components/Guardian/ChildProfilesManager.tsx": "Component for creating, renaming, and archiving child profiles with active and archived sections.",
   "frontend/src/components/Guardian/PrincipalLinkingPanel.tsx": "Component for linking and unlinking Internet Identity principals to child profiles with privacy notice.",
   "frontend/src/components/Guardian/GuardianPinSettings.tsx": "Component for setting or changing the guardian PIN with confirmation and validation.",
@@ -20,5 +20,10 @@
   "frontend/src/hooks/queries/useGuardianPin.ts": "React Query mutations for setting and verifying guardian PIN.",
   "frontend/src/index.css": "Global styles with OKLCH-based color system using black/white/red theme for safety/alert aesthetic, avoiding blue/purple colors.",
   "frontend/src/hooks/queries/useBiometricRecords.ts": "React Query hooks for biometric/touch-sensing record operations (list records for a child, add record, delete record) with proper cache invalidation.",
-  "frontend/src/components/Guardian/BiometricRecordsManager.tsx": "Guardian-only UI component for managing biometric/touch-sensing records per child profile with child selector, add/delete record forms, confirmation dialogs, and loading states using shadcn-ui components."
+  "frontend/src/components/Guardian/BiometricRecordsManager.tsx": "Guardian-only UI component for managing both biometric (text-based) and touch-sensing (numeric samples) records per child profile with unified record listing, type-specific add/delete operations, and interactive touch capture pad integration.",
+  "frontend/src/hooks/queries/useTouchRecords.ts": "React Query hooks for touch-sensing record operations (fetch, add, delete) with proper cache invalidation for touch records and unified record list.",
+  "frontend/src/components/Guardian/TouchCapturePad.tsx": "Interactive touch capture component that records raw numeric pointer/touch event data (position, pressure, radius, rotation) as samples and displays real-time capture feedback.",
+  "frontend/index.html": "HTML entry point with updated page title \"Child Access Control\" and meta description for SEO.",
+  "frontend/public/404.html": "Static fallback page that captures unknown paths and redirects to root with encoded redirect parameter for SPA deep-link recovery under custom HTTPS domains.",
+  "frontend/DEPLOYMENT.md": "Comprehensive deployment and publishing documentation covering production build steps, Internet Computer deployment, custom domain attachment with explicit domain slug validation rules (5-50 characters, letters/numbers/hyphens only), SPA deep-link handling explanation, upgrade checklist, asset management, and the example conversion \"child access control\" → \"child-access-control\"."
 }

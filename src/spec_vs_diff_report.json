@@ -1,47 +1,66 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T06:22:46.852Z",
-  "summary": "Diff adds a new biometric/touch-sensing records UI in the Guardian Dashboard, React Query hooks to call backend record APIs, a backend record type/state fields plus an upgrade migration, and updates Limitations & Privacy copy. However, the required backend API surface (especially delete-all) and backend-side authorization/child-profile validation are not evidenced in the provided backend diff excerpt.",
+  "generatedAt": "2026-02-08T07:00:08.320Z",
+  "summary": "REQ-18 and much of REQ-19 appear implemented (updated title/branding; SPA deep-link recovery via 404.html + redirect handling; icon path uses /assets/generated). REQ-17 is only partially evidenced due to truncated DEPLOYMENT.md content, and the diff includes substantial new product functionality (biometric/touch records, expanded dashboard, backend state) that was not requested and conflicts with the stated non-goals.",
   "missing_requirements": [
     {
-      "id": "REQ-10",
-      "requirement": "Backend APIs exist to add, list, delete a specific record, and delete all records for a child profile, with guardian-only authorization and childProfileId existence/not-archived validation, and records persist across upgrades.",
-      "reason": "The diff shows new state/types and a migration adding `biometricRecords` and a counter, but does not show implementation of the required public methods (especially a dedicated delete-all API), nor the required backend-side authorization checks and child existence/not-archived validation for record creation. Persistence across upgrades is implied by adding a migration module, but the actual stable-state pattern and API implementations are not visible in the truncated `backend/main.mo` excerpt.",
+      "id": "REQ-17",
+      "requirement": "Deployment document must explicitly state the domain slug validation rules (5–50 characters; letters, numbers, hyphens only).",
+      "reason": "A new deployment doc exists, but the provided DEPLOYMENT.md content is truncated before any domain slug rules are shown, so the required explicit statement is not evidenced.",
       "evidence": [
-        "backend/main.mo",
-        "backend/migration.mo"
+        "frontend/DEPLOYMENT.md (truncated)"
       ]
     },
     {
-      "id": "REQ-11",
-      "requirement": "Guardian can delete all records for a child profile via a confirmation step, wired through React Query to a backend delete-all operation.",
-      "reason": "The UI includes a delete-all confirmation state, but it performs delete-all by looping and calling the single-record delete mutation repeatedly; there is no React Query hook calling a backend \"delete all records\" API, which is explicitly required (and also required at the backend per REQ-10).",
+      "id": "REQ-17",
+      "requirement": "Deployment document must include an example converting \"child access control\" into a valid slug (e.g., \"child-access-control\").",
+      "reason": "DEPLOYMENT.md is truncated and no slug conversion example is visible in the diff summary, so this acceptance criterion is not evidenced.",
       "evidence": [
-        "frontend/src/components/Guardian/BiometricRecordsManager.tsx",
-        "frontend/src/hooks/queries/useBiometricRecords.ts"
+        "frontend/DEPLOYMENT.md (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-17",
+      "requirement": "Deployment document must describe build, deploy, upgrade, and how to attach a custom domain for IC deployment.",
+      "reason": "DEPLOYMENT.md exists but is truncated immediately after the start of the build section; no deploy/upgrade/custom-domain steps are visible in the diff summary.",
+      "evidence": [
+        "frontend/DEPLOYMENT.md (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Fix for a React Hooks rules violation by extracting a component function in App.tsx.",
-      "reason": "Not requested by REQ-10/11/12; appears as an unrelated change described in the diff-added summary file.",
+      "description": "Added/expanded backend functionality for user profiles, guardian PIN, child profile management, alarm event log, and biometric record storage.",
+      "reason": "BuildRequest scope is publishing readiness (docs, metadata, routing/assets). Non-goals explicitly exclude new product features (including new biometric/touch schemas). These backend feature additions are unrelated to REQ-17/18/19.",
       "evidence": [
-        "frontend-file-summaries.txt"
+        "backend/main.mo"
+      ]
+    },
+    {
+      "description": "Added SPA features and UI content unrelated to publishing (dashboard five-tab interface, biometric/touch-sensing records manager, alarm audible Web Audio behavior, expanded limitations/privacy content).",
+      "reason": "BuildRequest non-goals prohibit implementing new product features unrelated to publishing, specifically mentioning biometric/touch schemas and new dashboard features.",
+      "evidence": [
+        "frontend-file-summaries.txt (mentions BiometricRecordsManager, five-tab Dashboard, Web Audio alarm, updated LimitationsPrivacy content)"
+      ]
+    },
+    {
+      "description": "Updated project_state.json summary and feature listing content.",
+      "reason": "No requirement requests changing project_state.json; publishing-readiness tasks are confined to deployment docs, metadata, and routing/asset path behavior.",
+      "evidence": [
+        "project_state.json"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.74,
   "changed_files": [
     "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/Guardian/BiometricRecordsManager.tsx",
-    "frontend/src/hooks/queries/useBiometricRecords.ts",
-    "frontend/src/pages/Dashboard.tsx",
-    "frontend/src/pages/Landing.tsx",
-    "frontend/src/pages/LimitationsPrivacy.tsx",
+    "frontend/DEPLOYMENT.md",
+    "frontend/index.html",
+    "frontend/public/404.html",
+    "frontend/src/App.tsx",
+    "frontend/src/components/layout/AppShell.tsx",
     "project_state.json"
   ]
 }

@@ -1,55 +1,82 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Guardian-managed biometric/touch-sensing record UI + updated privacy/limitations copy",
+  "title": "Publish readiness: metadata, deep-link routing, and deployment documentation",
   "requirements": [
     {
-      "id": "REQ-11",
-      "summary": "Add a guardian-only Dashboard section to add, list, and delete biometric/touch-sensing records per child profile using React Query.",
+      "id": "REQ-17",
+      "summary": "Add a production publishing checklist and deployment steps doc (including custom domain + domain slug constraints).",
       "acceptanceCriteria": [
-        "A new guardian-facing section is available from the existing dashboard (e.g., under the Profiles tab or a new tab) to manage biometric/touch-sensing records per child profile.",
-        "Guardian can select a child profile and add a new record (with clear labeling of the data type: “biometric” vs “touch-sensing”).",
-        "Guardian can view a list of records for the selected child profile, including at minimum: record type and created timestamp.",
-        "Guardian can delete individual records and can delete all records for a child profile, with a confirmation step before destructive actions.",
-        "All data operations are wired via React Query mutations/queries and the UI shows loading and error states (toast or inline)."
+        "A new documentation file exists in the repo (e.g., DEPLOYMENT.md or README section) describing: build, deploy, upgrade, and how to attach a custom domain.",
+        "The document explicitly states the domain slug validation rules: 5–50 characters and only letters, numbers, and hyphens.",
+        "The document includes an example of converting the desired name \"child access control\" into a valid slug (e.g., \"child-access-control\")."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/queries/useBiometricRecords.ts",
+          "path": "frontend/DEPLOYMENT.md",
           "operation": "create",
-          "description": "Create React Query hooks for biometric/touch-sensing record management: query to list records for a selected child profile, mutation to add a record, and mutation to delete a record; include cache invalidation for the selected child’s record list. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/Guardian/BiometricRecordsManager.tsx",
-          "operation": "create",
-          "description": "Implement a guardian-only UI panel to manage biometric/touch-sensing records per child profile: child selector (using existing child profiles query), add-record form with dataType choice (“biometric” vs “touch-sensing”) and explicit user-entered data input, records list showing dataType + created timestamp, and destructive actions (delete single, delete all via confirmed action; delete-all can be implemented by sequentially deleting listed records if no single-call backend capability is available). Use shadcn-ui components (e.g., Card, Button, Input, Select/Radio, Dialog) for consistent styling and use toast/inline error states. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/Dashboard.tsx",
-          "operation": "modify",
-          "description": "Wire the new BiometricRecordsManager into the existing Guardian Dashboard Tabs as an additional tab/section (keeping existing tabs). Ensure the section remains guardian-only by relying on the current role gate that uses the authorization system’s role checks (via useGetCallerUserRole) and shows Access Denied to non-guardians. Verify the component's usage instructions before implementing."
+          "description": "Create a deployment/readiness document tailored to Internet Computer publishing: production build steps, frontend assets deployment considerations (including SPA deep-link handling), upgrade checklist, custom domain attachment steps, and explicit domain slug validation rules (5–50 chars; letters, numbers, hyphens only) including the example \"child access control\" → \"child-access-control\"."
         }
       ]
     },
     {
-      "id": "REQ-12",
-      "summary": "Update Landing and Limitations & Privacy copy to accurately describe stored biometric/touch-sensing records, guardian responsibility, and web-app touch-detection limitations.",
+      "id": "REQ-18",
+      "summary": "Update user-facing app metadata and visible branding to consistently use the name \"Child Access Control\".",
       "acceptanceCriteria": [
-        "The Limitations & Privacy page (frontend/src/pages/LimitationsPrivacy.tsx) no longer states “This app does NOT collect, store, or process any biometric data.”",
-        "The Limitations & Privacy page clearly states (in English) that this is a web app and still cannot perform automatic device-level touch detection outside the browser context.",
-        "The Landing page marketing bullet “Uses device authentication without collecting biometric data” is updated to reflect the new behavior accurately (in English).",
-        "All updated text is consistent across pages and does not claim capabilities the app does not implement (e.g., no claim of OS-wide touch monitoring)."
+        "The browser tab title (frontend/index.html) uses an English title consistent with \"Child Access Control\".",
+        "The header branding in the app shell remains consistent and does not reference invalid domain strings or previously failed domain attempts."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/LimitationsPrivacy.tsx",
+          "path": "frontend/index.html",
           "operation": "modify",
-          "description": "Revise the Privacy & Biometric Data section copy to remove the absolute claim that no biometric data is collected/stored; replace with accurate statements: (1) the app may store guardian-entered/guardian-managed records labeled as “biometric” or “touch-sensing” tied to child profiles, (2) the app does not capture device biometrics (no fingerprint/FaceID/TouchID data is exposed to the web app), (3) the web app cannot perform OS-level/system-wide touch detection and only stores data explicitly provided within the app UX, and (4) include clear guardian responsibility language and avoid implying any regulatory compliance guarantees. Verify the component's usage instructions before implementing."
+          "description": "Update the document title and any relevant page metadata to use the app name \"Child Access Control\" consistently (ensure no invalid domain characters are introduced into user-facing text)."
+        },
+        {
+          "path": "frontend/src/components/layout/AppShell.tsx",
+          "operation": "modify",
+          "description": "Update header branding text (and relevant alt text) to consistently display \"Child Access Control\" (avoid any prior/invalid domain-string branding)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "summary": "Ensure deep-link routing and generated asset paths work correctly when served from a custom HTTPS domain (including direct navigation to /dashboard, /alarm, /limitations and loading /assets/generated).",
+      "acceptanceCriteria": [
+        "A production build loads successfully and can navigate directly to /, /dashboard, /alarm, and /limitations without a blank page.",
+        "The generated icon referenced by the app shell (e.g., /assets/generated/alarm-bell-icon.dim_512x512.png) loads correctly in production.",
+        "No changes are made to any frontend immutablePaths files (hooks and ui components listed as immutable)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add SPA deep-link recovery logic for static hosting: when the app is loaded at / with a redirect indicator (set by a static 404 fallback page), automatically navigate to the intended route and clean up the URL so direct navigation to /dashboard, /alarm, and /limitations works without a blank page (do not modify immutable hooks or ui components)."
+        },
+        {
+          "path": "frontend/public/404.html",
+          "operation": "create",
+          "description": "Add a static fallback page that captures unknown paths (e.g., /dashboard) and redirects to / with an encoded redirect parameter so the SPA can recover and render the correct route under HTTPS custom domains."
+        },
+        {
+          "path": "frontend/public/assets/generated/alarm-bell-icon.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated icon asset at this exact path so absolute asset references to /assets/generated/alarm-bell-icon.dim_512x512.png resolve correctly in production."
+        },
+        {
+          "path": "frontend/public/assets/generated/phone-alert-illustration.dim_1200x600.png",
+          "operation": "create",
+          "description": "Add the generated illustration asset at this exact path so /assets/generated/phone-alert-illustration.dim_1200x600.png resolves correctly in production."
+        },
+        {
+          "path": "frontend/src/components/layout/AppShell.tsx",
+          "operation": "modify",
+          "description": "Confirm the app shell continues referencing generated assets via /assets/generated/* and that the icon path remains correct for production custom-domain hosting (no changes to immutablePaths)."
         },
         {
           "path": "frontend/src/pages/Landing.tsx",
           "operation": "modify",
-          "description": "Update the marketing bullet text that currently says “Uses device authentication without collecting biometric data” to an accurate English statement aligned with the new behavior (guardian-managed record storage; no device biometrics are captured). Ensure the revised wording does not claim OS-level touch monitoring or automatic device-level touch detection. Verify the component's usage instructions before implementing."
+          "description": "Confirm/adjust generated illustration usage to ensure it loads from /assets/generated in production and remains consistent with the updated app naming (no changes to immutablePaths)."
         }
       ]
     }

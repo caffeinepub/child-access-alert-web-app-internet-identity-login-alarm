@@ -1,14 +1,17 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
+  "projectStateVersion": 9,
   "summary": "Mobile app/web app concept that aims to detect child (under 13) phone use/touch, identify the child (potentially via biometrics), and trigger an alert/ringing, with the new requirement to store biometric data and/or touch-sensing data.",
   "architectural_notes": [
     "Use device biometric authentication/face recognition capabilities (where available) to identify the child and trigger an audible alert when detected.",
-    "If biometric or touch-sensing data must be stored, define what data is collected, where it is stored (on-device vs backend), how it is encrypted, retention/deletion policy, and consent/guardian controls."
+    "If biometric or touch-sensing data must be stored, define what data is collected, where it is stored (on-device vs backend), how it is encrypted, retention/deletion policy, and consent/guardian controls.",
+    "When capturing/storing touch-sensing data in the web app, persist only raw numeric touch event fields available via browser APIs (e.g., x/y, pressure, radiusX/radiusY, rotationAngle), not text descriptions.",
+    "Domain/name must be 5–50 characters and contain only letters, numbers, and hyphens (no spaces/parentheses)."
   ],
   "known_issues": [
     "Biometric identification for children and apps targeting under-13 may have significant platform/policy/privacy constraints; requirements may need adjustment based on OS capabilities and child privacy regulations.",
-    "Storing biometric data and/or raw touch-sensing data for under-13 users is likely to be prohibited or heavily restricted by platform policies and child privacy laws; may require major scope change and legal/compliance review (or redesign to avoid storing such data)."
+    "Storing biometric data and/or raw touch-sensing data for under-13 users is likely to be prohibited or heavily restricted by platform policies and child privacy laws; may require major scope change and legal/compliance review (or redesign to avoid storing such data).",
+    "Domain assignment/validation failing due to invalid characters/length in proposed domain names; must conform to 5–50 chars and letters/numbers/hyphens only."
   ],
   "isFixRequest": false,
   "existing_features": [
@@ -91,6 +94,46 @@
         "REQ-12"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-guardian-dashboard-biometric-touch-sensing-records-ui-so-adding-a-touch-sensing-record-captures-real-touch-pointer-events-from-an-on-screen-capture-area-and-submits-only-numeric-samples-to-the-backend-no-free-text-input-for-touch-sensing",
+      "title": "Update the Guardian Dashboard “Biometric & Touch-Sensing Records” UI so adding a touch-sensing record captures real touch/pointer events from an on-screen capture area and submits only numeric samples to the backend (no free-text input for touch-sensing).",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-user-facing-copy-to-accurately-describe-that-touch-sensing-records-are-captured-as-raw-numeric-touch-samples-from-interactions-inside-the-web-app-and-remove-replace-any-remaining-text-representation-wording-for-touch-sensing-data-including-on-the-limitations-privacy-page-and-the-records-manager-dialog",
+      "title": "Update user-facing copy to accurately describe that touch-sensing records are captured as raw numeric touch samples from interactions inside the web app, and remove/replace any remaining text-representation wording for touch-sensing data (including on the Limitations & Privacy page and the records manager dialog).",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-production-publishing-checklist-and-deployment-steps-document-that-explains-how-to-deploy-the-backend-canister-and-the-frontend-assets-to-the-internet-computer-including-how-to-configure-a-custom-domain-and-the-exact-domain-slug-constraints-5-50-chars-letters-numbers-hyphens-only",
+      "title": "Add a production publishing checklist and deployment steps document that explains how to deploy the backend canister and the frontend assets to the Internet Computer, including how to configure a custom domain and the exact domain slug constraints (5–50 chars; letters, numbers, hyphens only).",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-user-facing-app-metadata-to-reflect-the-new-app-name-child-access-control-consistently-where-it-appears-in-the-ui-and-page-metadata-without-using-invalid-domain-characters",
+      "title": "Update user-facing app metadata to reflect the new app name \"Child Access Control\" consistently where it appears in the UI and page metadata, without using invalid domain characters.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-frontend-routing-and-asset-paths-work-correctly-when-the-app-is-served-from-a-custom-domain-over-https-including-direct-navigation-to-routes-like-dashboard-alarm-and-limitations-and-loading-generated-assets-from-assets-generated",
+      "title": "Ensure the frontend routing and asset paths work correctly when the app is served from a custom domain over HTTPS, including direct navigation to routes like /dashboard, /alarm, and /limitations and loading generated assets from /assets/generated.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -121,10 +164,32 @@
         "REQ-10"
       ],
       "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Record and store raw numeric touch sensor samples provided by the browser (e.g., x/y, pressure, radiusX/radiusY, rotationAngle) rather than any text representation/notes.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Update the backend data model and Candid interface so touch-sensing records can be stored as structured raw numeric touch samples (e.g., x, y, pressure, radiusX, radiusY, rotationAngle, and a timestamp), rather than storing touch data as text encoded into bytes.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Update existing backend biometric record behavior to remain compatible with the current UI’s record list (record id, childId, timestamp, and a way to determine record type), while clearly distinguishing between biometric blob records and touch-sensing numeric-sample records.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "Child Access Alert Web App (Internet Identity login + alarm)",
+  "projectName": "child access control",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

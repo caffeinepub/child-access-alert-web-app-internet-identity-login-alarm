@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        // SPA deep-link recovery for static hosting
+        // Capture the intended path and redirect to root with encoded parameter
+        (function() {
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var hash = window.location.hash;
+            
+            // Only redirect if not already at root
+            if (path !== '/') {
+                var redirect = path + search + hash;
+                window.location.replace('/?redirect=' + encodeURIComponent(redirect));
+            }
+        })();
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>

@@ -8,12 +8,21 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const Time = IDL.Int;
+export const TouchSample = IDL.Record({
+  'x' : IDL.Float64,
+  'y' : IDL.Float64,
+  'force' : IDL.Float64,
+  'radiusX' : IDL.Float64,
+  'radiusY' : IDL.Float64,
+  'rotationAngle' : IDL.Float64,
+  'timestamp' : Time,
+});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
-export const Time = IDL.Int;
 export const AlarmEvent = IDL.Record({
   'childProfileId' : IDL.Text,
   'acknowledged' : IDL.Bool,
@@ -32,6 +41,18 @@ export const ChildProfile = IDL.Record({
   'name' : IDL.Text,
   'isArchived' : IDL.Bool,
 });
+export const TouchRecord = IDL.Record({
+  'id' : IDL.Nat,
+  'childId' : IDL.Text,
+  'recordTimestamp' : Time,
+  'samples' : IDL.Vec(TouchSample),
+});
+export const RecordListEntry = IDL.Record({
+  'id' : IDL.Nat,
+  'recordType' : IDL.Variant({ 'touch' : IDL.Null, 'biometric' : IDL.Null }),
+  'childId' : IDL.Text,
+  'timestamp' : Time,
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -41,10 +62,12 @@ export const idlService = IDL.Service({
       [IDL.Nat],
       [],
     ),
+  'addTouchRecord' : IDL.Func([IDL.Text, IDL.Vec(TouchSample)], [IDL.Nat], []),
   'archiveChildProfile' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createChildProfile' : IDL.Func([IDL.Text, IDL.Text], [], []),
   'deleteBiometricRecord' : IDL.Func([IDL.Nat], [], []),
+  'deleteTouchRecord' : IDL.Func([IDL.Nat], [], []),
   'getAlarmEvents' : IDL.Func([], [IDL.Vec(AlarmEvent)], ['query']),
   'getBiometricRecordsForChild' : IDL.Func(
       [IDL.Text],
@@ -55,6 +78,12 @@ export const idlService = IDL.Service({
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getChildProfiles' : IDL.Func([], [IDL.Vec(ChildProfile)], ['query']),
   'getLinkedChildProfile' : IDL.Func([], [IDL.Opt(ChildProfile)], ['query']),
+  'getTouchRecordsForChild' : IDL.Func(
+      [IDL.Text],
+      [IDL.Vec(TouchRecord)],
+      ['query'],
+    ),
+  'getUnifiedRecordList' : IDL.Func([], [IDL.Vec(RecordListEntry)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -74,12 +103,21 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const Time = IDL.Int;
+  const TouchSample = IDL.Record({
+    'x' : IDL.Float64,
+    'y' : IDL.Float64,
+    'force' : IDL.Float64,
+    'radiusX' : IDL.Float64,
+    'radiusY' : IDL.Float64,
+    'rotationAngle' : IDL.Float64,
+    'timestamp' : Time,
+  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
-  const Time = IDL.Int;
   const AlarmEvent = IDL.Record({
     'childProfileId' : IDL.Text,
     'acknowledged' : IDL.Bool,
@@ -98,6 +136,18 @@ export const idlFactory = ({ IDL }) => {
     'name' : IDL.Text,
     'isArchived' : IDL.Bool,
   });
+  const TouchRecord = IDL.Record({
+    'id' : IDL.Nat,
+    'childId' : IDL.Text,
+    'recordTimestamp' : Time,
+    'samples' : IDL.Vec(TouchSample),
+  });
+  const RecordListEntry = IDL.Record({
+    'id' : IDL.Nat,
+    'recordType' : IDL.Variant({ 'touch' : IDL.Null, 'biometric' : IDL.Null }),
+    'childId' : IDL.Text,
+    'timestamp' : Time,
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -107,10 +157,16 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         [],
       ),
+    'addTouchRecord' : IDL.Func(
+        [IDL.Text, IDL.Vec(TouchSample)],
+        [IDL.Nat],
+        [],
+      ),
     'archiveChildProfile' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createChildProfile' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'deleteBiometricRecord' : IDL.Func([IDL.Nat], [], []),
+    'deleteTouchRecord' : IDL.Func([IDL.Nat], [], []),
     'getAlarmEvents' : IDL.Func([], [IDL.Vec(AlarmEvent)], ['query']),
     'getBiometricRecordsForChild' : IDL.Func(
         [IDL.Text],
@@ -121,6 +177,16 @@ export const idlFactory = ({ IDL }) => {
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getChildProfiles' : IDL.Func([], [IDL.Vec(ChildProfile)], ['query']),
     'getLinkedChildProfile' : IDL.Func([], [IDL.Opt(ChildProfile)], ['query']),
+    'getTouchRecordsForChild' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(TouchRecord)],
+        ['query'],
+      ),
+    'getUnifiedRecordList' : IDL.Func(
+        [],
+        [IDL.Vec(RecordListEntry)],
+        ['query'],
+      ),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],

@@ -27,7 +27,29 @@ export interface ChildProfile {
   'name' : string,
   'isArchived' : boolean,
 }
+export interface RecordListEntry {
+  'id' : bigint,
+  'recordType' : { 'touch' : null } |
+    { 'biometric' : null },
+  'childId' : string,
+  'timestamp' : Time,
+}
 export type Time = bigint;
+export interface TouchRecord {
+  'id' : bigint,
+  'childId' : string,
+  'recordTimestamp' : Time,
+  'samples' : Array<TouchSample>,
+}
+export interface TouchSample {
+  'x' : number,
+  'y' : number,
+  'force' : number,
+  'radiusX' : number,
+  'radiusY' : number,
+  'rotationAngle' : number,
+  'timestamp' : Time,
+}
 export interface UserProfile { 'name' : string, 'role' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
@@ -36,16 +58,20 @@ export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'acknowledgeAlarm' : ActorMethod<[], undefined>,
   'addBiometricRecord' : ActorMethod<[string, string, Uint8Array], bigint>,
+  'addTouchRecord' : ActorMethod<[string, Array<TouchSample>], bigint>,
   'archiveChildProfile' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createChildProfile' : ActorMethod<[string, string], undefined>,
   'deleteBiometricRecord' : ActorMethod<[bigint], undefined>,
+  'deleteTouchRecord' : ActorMethod<[bigint], undefined>,
   'getAlarmEvents' : ActorMethod<[], Array<AlarmEvent>>,
   'getBiometricRecordsForChild' : ActorMethod<[string], Array<BiometricRecord>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getChildProfiles' : ActorMethod<[], Array<ChildProfile>>,
   'getLinkedChildProfile' : ActorMethod<[], [] | [ChildProfile]>,
+  'getTouchRecordsForChild' : ActorMethod<[string], Array<TouchRecord>>,
+  'getUnifiedRecordList' : ActorMethod<[], Array<RecordListEntry>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isAlarmActive' : ActorMethod<[], boolean>,
   'isCallerAdmin' : ActorMethod<[], boolean>,

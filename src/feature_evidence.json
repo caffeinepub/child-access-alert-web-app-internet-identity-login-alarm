@@ -2,12 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-implement-frontend-ui-in-the-guardian-dashboard-to-manage-stored-biometric-touch-sensing-data-per-child-profile-including-adding-a-new-record-listing-existing-records-and-deleting-records-guardian-only",
-      "featureTitle": "Implement frontend UI in the Guardian Dashboard to manage stored biometric/touch-sensing data per child profile, including adding a new record, listing existing records, and deleting records (guardian-only).",
+      "featureId": "feature-add-a-production-publishing-checklist-and-deployment-steps-document-that-explains-how-to-deploy-the-backend-canister-and-the-frontend-assets-to-the-internet-computer-including-how-to-configure-a-custom-domain-and-the-exact-domain-slug-constraints-5-50-chars-letters-numbers-hyphens-only",
+      "featureTitle": "Add a production publishing checklist and deployment steps document that explains how to deploy the backend canister and the frontend assets to the Internet Computer, including how to configure a custom domain and the exact domain slug constraints (5–50 chars; letters, numbers, hyphens only).",
       "files": [
-        "frontend/src/components/Guardian/BiometricRecordsManager.tsx",
-        "frontend/src/hooks/queries/useBiometricRecords.ts",
-        "frontend/src/pages/Dashboard.tsx"
+        "frontend/DEPLOYMENT.md"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,16 +16,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-11"
+        "REQ-17"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-user-facing-copy-to-remove-existing-claims-that-the-app-does-not-collect-store-biometric-data-and-instead-accurately-describe-what-biometric-touch-sensing-data-is-stored-who-can-manage-it-and-the-web-app-limitations-around-device-level-touch-detection",
-      "featureTitle": "Update user-facing copy to remove existing claims that the app does not collect/store biometric data, and instead accurately describe what biometric/touch-sensing data is stored, who can manage it, and the web-app limitations around device-level touch detection.",
+      "featureId": "feature-update-user-facing-app-metadata-to-reflect-the-new-app-name-child-access-control-consistently-where-it-appears-in-the-ui-and-page-metadata-without-using-invalid-domain-characters",
+      "featureTitle": "Update user-facing app metadata to reflect the new app name \"Child Access Control\" consistently where it appears in the UI and page metadata, without using invalid domain characters.",
       "files": [
-        "frontend/src/pages/Landing.tsx",
-        "frontend/src/pages/LimitationsPrivacy.tsx"
+        "frontend/index.html",
+        "frontend/src/components/layout/AppShell.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -38,7 +36,28 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-12"
+        "REQ-18"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-the-frontend-routing-and-asset-paths-work-correctly-when-the-app-is-served-from-a-custom-domain-over-https-including-direct-navigation-to-routes-like-dashboard-alarm-and-limitations-and-loading-generated-assets-from-assets-generated",
+      "featureTitle": "Ensure the frontend routing and asset paths work correctly when the app is served from a custom domain over HTTPS, including direct navigation to routes like /dashboard, /alarm, and /limitations and loading generated assets from /assets/generated.",
+      "files": [
+        "frontend/public/404.html",
+        "frontend/src/App.tsx",
+        "frontend/src/components/layout/AppShell.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-19"
       ],
       "confidence": "high"
     }

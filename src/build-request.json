@@ -1,82 +1,85 @@
 {
   "kind": "build_request",
-  "title": "Add storage and management of child biometric/touch-sensing data (guardian-controlled)",
+  "title": "Publish the app (deployment readiness + valid domain slug)",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-10",
-      "text": "Add backend data models and stable-state storage to associate \"biometric data\" and/or \"touch-sensing data\" records with a specific child profile, with guardian-only authorization for create/read/delete operations.",
-      "target": "backend",
+      "id": "REQ-17",
+      "text": "Add a production publishing checklist and deployment steps document that explains how to deploy the backend canister and the frontend assets to the Internet Computer, including how to configure a custom domain and the exact domain slug constraints (5–50 chars; letters, numbers, hyphens only).",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "This app should store biometric data or touch sense of child"
+          "Publish the app"
         ]
       },
       "acceptanceCriteria": [
-        "Backend stores one or more data records per childProfileId in canister state so data persists across upgrades (using the project’s existing state patterns).",
-        "Only guardian/admin callers can add, view, list, or delete stored biometric/touch-sensing records; non-guardian callers receive an authorization error.",
-        "APIs exist to: (1) add a record for a child profile, (2) list records for a child profile, (3) delete a specific record, and (4) delete all records for a child profile.",
-        "Backend validates the referenced childProfileId exists and is not archived before accepting new records."
+        "A new documentation file exists in the repo (e.g., DEPLOYMENT.md or README section) describing: build, deploy, upgrade, and how to attach a custom domain.",
+        "The document explicitly states the domain slug validation rules: 5–50 characters and only letters, numbers, and hyphens.",
+        "The document includes an example of converting the desired name \"child access control\" into a valid slug (e.g., \"child-access-control\")."
       ]
     },
     {
-      "id": "REQ-11",
-      "text": "Implement frontend UI in the Guardian Dashboard to manage stored biometric/touch-sensing data per child profile, including adding a new record, listing existing records, and deleting records (guardian-only).",
+      "id": "REQ-18",
+      "text": "Update user-facing app metadata to reflect the new app name \"Child Access Control\" consistently where it appears in the UI and page metadata, without using invalid domain characters.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "This app should store biometric data or touch sense of child"
+          "Rename this to child access control",
+          "Publish the app"
         ]
       },
       "acceptanceCriteria": [
-        "A new guardian-facing section is available from the existing dashboard (e.g., under the Profiles tab or a new tab) to manage biometric/touch-sensing records per child profile.",
-        "Guardian can select a child profile and add a new record (with clear labeling of the data type: “biometric” vs “touch-sensing”).",
-        "Guardian can view a list of records for the selected child profile, including at minimum: record type and created timestamp.",
-        "Guardian can delete individual records and can delete all records for a child profile, with a confirmation step before destructive actions.",
-        "All data operations are wired via React Query mutations/queries and the UI shows loading and error states (toast or inline)."
+        "The browser tab title (frontend/index.html) uses an English title consistent with \"Child Access Control\".",
+        "The header branding in the app shell remains consistent and does not reference invalid domain strings or previously failed domain attempts."
       ]
     },
     {
-      "id": "REQ-12",
-      "text": "Update user-facing copy to remove existing claims that the app does not collect/store biometric data, and instead accurately describe what biometric/touch-sensing data is stored, who can manage it, and the web-app limitations around device-level touch detection.",
+      "id": "REQ-19",
+      "text": "Ensure the frontend routing and asset paths work correctly when the app is served from a custom domain over HTTPS, including direct navigation to routes like /dashboard, /alarm, and /limitations and loading generated assets from /assets/generated.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "This app should store biometric data or touch sense of child"
+          "Publish the app"
         ]
       },
       "acceptanceCriteria": [
-        "The Limitations & Privacy page (frontend/src/pages/LimitationsPrivacy.tsx) no longer states “This app does NOT collect, store, or process any biometric data.”",
-        "The Limitations & Privacy page clearly states (in English) that this is a web app and still cannot perform automatic device-level touch detection outside the browser context.",
-        "The Landing page marketing bullet “Uses device authentication without collecting biometric data” is updated to reflect the new behavior accurately (in English).",
-        "All updated text is consistent across pages and does not claim capabilities the app does not implement (e.g., no claim of OS-wide touch monitoring)."
+        "A production build loads successfully and can navigate directly to /, /dashboard, /alarm, and /limitations without a blank page.",
+        "The generated icon referenced by the app shell (e.g., /assets/generated/alarm-bell-icon.dim_512x512.png) loads correctly in production.",
+        "No changes are made to any frontend immutablePaths files (hooks and ui components listed as immutable)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
-    "Do not edit files in frontend immutablePaths (compose existing UI components instead).",
-    "All user-facing text must be in English.",
-    "Do not claim or implement OS-level/system-wide touch detection; only store data explicitly provided within the web app UX.",
-    "Because this app concerns children under 13, ensure the UI copy presents clear guardian responsibility and does not imply regulatory compliance guarantees."
+    "Respect the single-actor backend architecture: all Motoko logic remains in backend/main.mo; add backend/migration.mo only if a state upgrade is required.",
+    "Do not modify any files under frontend immutablePaths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui). Compose existing UI components instead.",
+    "Domain slug must be 5–50 characters and contain only letters, numbers, and hyphens."
   ],
   "nonGoals": [
-    "Implementing real biometric recognition or matching/identification algorithms.",
-    "Capturing fingerprint/FaceID/TouchID data from the device (Internet Identity/WebAuthn does not expose biometrics to the app).",
-    "Implementing native mobile capabilities or background/system monitoring.",
-    "Integrating third-party biometric providers or external databases."
+    "Implementing new product features unrelated to publishing (e.g., new alarm logic, new biometric/touch schemas, new dashboard features).",
+    "Adding third-party hosting, external databases, or non-Internet-Computer deployment targets.",
+    "Adding third-party authentication providers beyond Internet Identity."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

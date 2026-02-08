@@ -95,6 +95,27 @@ export interface AlarmEvent {
     timestamp: Time;
 }
 export type Time = bigint;
+export interface RecordListEntry {
+    id: bigint;
+    recordType: Variant_touch_biometric;
+    childId: string;
+    timestamp: Time;
+}
+export interface TouchRecord {
+    id: bigint;
+    childId: string;
+    recordTimestamp: Time;
+    samples: Array<TouchSample>;
+}
+export interface TouchSample {
+    x: number;
+    y: number;
+    force: number;
+    radiusX: number;
+    radiusY: number;
+    rotationAngle: number;
+    timestamp: Time;
+}
 export interface BiometricRecord {
     id: bigint;
     data: Uint8Array;
@@ -116,20 +137,28 @@ export enum UserRole {
     user = "user",
     guest = "guest"
 }
+export enum Variant_touch_biometric {
+    touch = "touch",
+    biometric = "biometric"
+}
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     acknowledgeAlarm(): Promise<void>;
     addBiometricRecord(childId: string, dataType: string, data: Uint8Array): Promise<bigint>;
+    addTouchRecord(childId: string, samples: Array<TouchSample>): Promise<bigint>;
     archiveChildProfile(id: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     createChildProfile(id: string, name: string): Promise<void>;
     deleteBiometricRecord(recordId: bigint): Promise<void>;
+    deleteTouchRecord(recordId: bigint): Promise<void>;
     getAlarmEvents(): Promise<Array<AlarmEvent>>;
     getBiometricRecordsForChild(childId: string): Promise<Array<BiometricRecord>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getChildProfiles(): Promise<Array<ChildProfile>>;
     getLinkedChildProfile(): Promise<ChildProfile | null>;
+    getTouchRecordsForChild(childId: string): Promise<Array<TouchRecord>>;
+    getUnifiedRecordList(): Promise<Array<RecordListEntry>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isAlarmActive(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
@@ -141,7 +170,7 @@ export interface backendInterface {
     unlinkPrincipalFromChild(principal: Principal): Promise<void>;
     verifyGuardianPin(pin: string): Promise<boolean>;
 }
-import type { ChildProfile as _ChildProfile, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { ChildProfile as _ChildProfile, RecordListEntry as _RecordListEntry, Time as _Time, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -183,6 +212,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.addBiometricRecord(arg0, arg1, arg2);
+            return result;
+        }
+    }
+    async addTouchRecord(arg0: string, arg1: Array<TouchSample>): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addTouchRecord(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addTouchRecord(arg0, arg1);
             return result;
         }
     }
@@ -239,6 +282,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.deleteBiometricRecord(arg0);
+            return result;
+        }
+    }
+    async deleteTouchRecord(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteTouchRecord(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteTouchRecord(arg0);
             return result;
         }
     }
@@ -324,6 +381,34 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getLinkedChildProfile();
             return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getTouchRecordsForChild(arg0: string): Promise<Array<TouchRecord>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTouchRecordsForChild(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTouchRecordsForChild(arg0);
+            return result;
+        }
+    }
+    async getUnifiedRecordList(): Promise<Array<RecordListEntry>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getUnifiedRecordList();
+                return from_candid_vec_n7(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getUnifiedRecordList();
+            return from_candid_vec_n7(this._uploadFile, this._downloadFile, result);
         }
     }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
@@ -467,6 +552,9 @@ export class Backend implements backendInterface {
         }
     }
 }
+function from_candid_RecordListEntry_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _RecordListEntry): RecordListEntry {
+    return from_candid_record_n9(_uploadFile, _downloadFile, value);
+}
 function from_candid_UserRole_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
     return from_candid_variant_n5(_uploadFile, _downloadFile, value);
 }
@@ -476,6 +564,35 @@ function from_candid_opt_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Ar
 function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ChildProfile]): ChildProfile | null {
     return value.length === 0 ? null : value[0];
 }
+function from_candid_record_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: bigint;
+    recordType: {
+        touch: null;
+    } | {
+        biometric: null;
+    };
+    childId: string;
+    timestamp: _Time;
+}): {
+    id: bigint;
+    recordType: Variant_touch_biometric;
+    childId: string;
+    timestamp: Time;
+} {
+    return {
+        id: value.id,
+        recordType: from_candid_variant_n10(_uploadFile, _downloadFile, value.recordType),
+        childId: value.childId,
+        timestamp: value.timestamp
+    };
+}
+function from_candid_variant_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    touch: null;
+} | {
+    biometric: null;
+}): Variant_touch_biometric {
+    return "touch" in value ? Variant_touch_biometric.touch : "biometric" in value ? Variant_touch_biometric.biometric : value;
+}
 function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;
 } | {
@@ -484,6 +601,9 @@ function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uin
     guest: null;
 }): UserRole {
     return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
+}
+function from_candid_vec_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_RecordListEntry>): Array<RecordListEntry> {
+    return value.map((x)=>from_candid_RecordListEntry_n8(_uploadFile, _downloadFile, x));
 }
 function to_candid_UserRole_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n2(_uploadFile, _downloadFile, value);

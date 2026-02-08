@@ -55,8 +55,8 @@ export default function LimitationsPrivacy() {
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
                 <strong>Guardian-Managed Records:</strong> This app allows guardians to store records labeled as
-                "biometric" or "touch-sensing" data tied to child profiles. These records are explicitly entered by
-                guardians within the app.
+                "biometric" or "touch-sensing" data tied to child profiles. These records are explicitly entered or
+                captured by guardians within the app.
               </p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                 <li>
@@ -65,8 +65,9 @@ export default function LimitationsPrivacy() {
                   such data to web applications.
                 </li>
                 <li>
-                  <strong>No automatic touch detection:</strong> The app cannot perform OS-level or system-wide touch
-                  detection. It only stores data that guardians explicitly provide within the app interface.
+                  <strong>Touch-sensing data:</strong> Touch-sensing records are stored as numeric samples collected
+                  within the app UI (position, pressure, radius, rotation angle). The app cannot perform OS-level or
+                  system-wide touch detection; it only captures pointer/touch interactions within its own interface.
                 </li>
                 <li>
                   <strong>Guardian responsibility:</strong> Guardians are solely responsible for the data they choose to
@@ -138,8 +139,8 @@ export default function LimitationsPrivacy() {
                   <strong>Child profiles:</strong> Only display names chosen by guardians (no personal information)
                 </li>
                 <li>
-                  <strong>Guardian-entered records:</strong> Text-based records labeled as "biometric" or
-                  "touch-sensing" that guardians explicitly enter and manage
+                  <strong>Guardian-entered records:</strong> Text-based biometric records or numeric touch-sensing
+                  samples that guardians explicitly enter or capture within the app
                 </li>
                 <li>
                   <strong>Access logs:</strong> Timestamps and which child profile triggered an alarm

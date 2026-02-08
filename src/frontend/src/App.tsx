@@ -1,4 +1,4 @@
-import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
+import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet, useNavigate } from '@tanstack/react-router';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useGetCallerUserProfile } from './hooks/queries/useCurrentUser';
 import AppShell from './components/layout/AppShell';
@@ -9,13 +9,28 @@ import LimitationsPrivacy from './pages/LimitationsPrivacy';
 import ProfileSetupModal from './components/Auth/ProfileSetupModal';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from 'next-themes';
+import { useEffect } from 'react';
 
 function RootComponent() {
   const { identity } = useInternetIdentity();
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
   const isAuthenticated = !!identity;
+  const navigate = useNavigate();
 
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
+
+  // SPA deep-link recovery: handle redirect parameter from 404.html
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirect');
+    
+    if (redirect) {
+      // Clean up URL and navigate to intended route
+      const cleanUrl = window.location.pathname + window.location.hash;
+      window.history.replaceState({}, '', cleanUrl);
+      navigate({ to: redirect as any });
+    }
+  }, [navigate]);
 
   return (
     <>

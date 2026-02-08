@@ -1,3 +1,4 @@
+// No changes needed.
 import Map "mo:core/Map";
 import Iter "mo:core/Iter";
 import Time "mo:core/Time";
@@ -8,12 +9,13 @@ import Int "mo:core/Int";
 import Order "mo:core/Order";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
-import Migration "migration";
+import List "mo:core/List";
+
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
 // Use migration function on upgrade
-(with migration = Migration.run)
+
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -48,7 +50,7 @@ actor {
     };
   };
 
-  type BiometricRecord = {
+  public type BiometricRecord = {
     id : Nat;
     childId : Text;
     dataType : Text; // "fingerprint", "face", etc.
@@ -234,7 +236,7 @@ actor {
     };
   };
 
-  // NEW: Biometric record management
+  // Biometric record management
   public shared ({ caller }) func addBiometricRecord(childId : Text, dataType : Text, data : [Nat8]) : async Nat {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Guardian only");
@@ -274,5 +276,111 @@ actor {
     if (not success) {
       Runtime.trap("Record not found");
     };
+  };
+
+  // Touch Sensing Record Management
+  public type TouchSample = {
+    x : Float;
+    y : Float;
+    force : Float;
+    radiusX : Float;
+    radiusY : Float;
+    rotationAngle : Float;
+    timestamp : Time.Time;
+  };
+
+  type TouchRecord = {
+    id : Nat;
+    childId : Text;
+    samples : [TouchSample];
+    recordTimestamp : Time.Time;
+  };
+
+  let touchRecords = Map.empty<Nat, TouchRecord>();
+  var touchRecordCounter : Nat = 0;
+
+  public shared ({ caller }) func addTouchRecord(childId : Text, samples : [TouchSample]) : async Nat {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Guardian only");
+    };
+
+    let record : TouchRecord = {
+      id = touchRecordCounter;
+      childId;
+      samples;
+      recordTimestamp = Time.now();
+    };
+
+    touchRecords.add(touchRecordCounter, record);
+    touchRecordCounter += 1;
+    record.id;
+  };
+
+  public query ({ caller }) func getTouchRecordsForChild(childId : Text) : async [TouchRecord] {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Guardian only");
+    };
+
+    touchRecords.values().toArray().filter(
+      func(record) { record.childId == childId }
+    );
+  };
+
+  public shared ({ caller }) func deleteTouchRecord(recordId : Nat) : async () {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Guardian only");
+    };
+
+    let success = touchRecords.containsKey(recordId);
+    touchRecords.remove(recordId);
+
+    if (not success) {
+      Runtime.trap("Record not found");
+    };
+  };
+
+  // Unified Record List
+  public type RecordListEntry = {
+    id : Nat;
+    childId : Text;
+    timestamp : Time.Time;
+    recordType : {
+      #biometric;
+      #touch;
+    };
+  };
+
+  public query ({ caller }) func getUnifiedRecordList() : async [RecordListEntry] {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Guardian only");
+    };
+
+    let entries = List.empty<RecordListEntry>();
+
+    // Add biometric records
+    biometricRecords.values().forEach(
+      func(record) {
+        entries.add({
+          id = record.id;
+          childId = record.childId;
+          timestamp = record.timestamp;
+          recordType = #biometric;
+        });
+      }
+    );
+
+    // Add touch records
+    touchRecords.values().forEach(
+      func(record) {
+        entries.add({
+          id = record.id;
+          childId = record.childId;
+          timestamp = record.recordTimestamp;
+          recordType = #touch;
+        });
+      }
+    );
+
+    entries.toArray();
   };
 };

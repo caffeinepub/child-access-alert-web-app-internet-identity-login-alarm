@@ -4,12 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Fingerprint, Plus, Trash2, Loader2, AlertTriangle } from 'lucide-react';
+import { Fingerprint, Plus, Trash2, Loader2, AlertTriangle, Hand } from 'lucide-react';
 import {
   useGetBiometricRecordsForChild,
   useAddBiometricRecord,
   useDeleteBiometricRecord,
 } from '../../hooks/queries/useBiometricRecords';
+import {
+  useGetTouchRecordsForChild,
+  useAddTouchRecord,
+  useDeleteTouchRecord,
+} from '../../hooks/queries/useTouchRecords';
 import { useGetChildProfiles } from '../../hooks/queries/useChildProfiles';
 import { toast } from 'sonner';
 import {
@@ -38,22 +43,58 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import TouchCapturePad from './TouchCapturePad';
+import type { TouchSample } from '../../backend';
+
+type RecordType = 'biometric' | 'touch-sensing';
+
+interface UnifiedRecord {
+  id: bigint;
+  type: RecordType;
+  timestamp: bigint;
+  dataSize: number;
+}
 
 export default function BiometricRecordsManager() {
   const { data: profiles, isLoading: profilesLoading } = useGetChildProfiles();
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
-  const { data: records, isLoading: recordsLoading } = useGetBiometricRecordsForChild(selectedChildId);
-  const addRecord = useAddBiometricRecord();
-  const deleteRecord = useDeleteBiometricRecord();
+  
+  const { data: biometricRecords, isLoading: biometricLoading } = useGetBiometricRecordsForChild(selectedChildId);
+  const { data: touchRecords, isLoading: touchLoading } = useGetTouchRecordsForChild(selectedChildId);
+  
+  const addBiometricRecord = useAddBiometricRecord();
+  const deleteBiometricRecord = useDeleteBiometricRecord();
+  const addTouchRecord = useAddTouchRecord();
+  const deleteTouchRecord = useDeleteTouchRecord();
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [dataType, setDataType] = useState<'biometric' | 'touch-sensing'>('biometric');
-  const [dataInput, setDataInput] = useState('');
+  const [recordType, setRecordType] = useState<RecordType>('biometric');
+  const [biometricInput, setBiometricInput] = useState('');
+  const [touchSamples, setTouchSamples] = useState<TouchSample[]>([]);
+  const [isCapturing, setIsCapturing] = useState(false);
   const [deleteAllDialogOpen, setDeleteAllDialogOpen] = useState(false);
   const [deletingAll, setDeletingAll] = useState(false);
 
   const activeProfiles = profiles?.filter((p) => !p.isArchived) || [];
   const selectedProfile = activeProfiles.find((p) => p.id === selectedChildId);
+
+  // Combine and sort records
+  const unifiedRecords: UnifiedRecord[] = [
+    ...(biometricRecords || []).map((r) => ({
+      id: r.id,
+      type: 'biometric' as RecordType,
+      timestamp: r.timestamp,
+      dataSize: r.data.length,
+    })),
+    ...(touchRecords || []).map((r) => ({
+      id: r.id,
+      type: 'touch-sensing' as RecordType,
+      timestamp: r.recordTimestamp,
+      dataSize: r.samples.length,
+    })),
+  ].sort((a, b) => Number(b.timestamp - a.timestamp));
+
+  const recordsLoading = biometricLoading || touchLoading;
 
   const handleAddRecord = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,32 +102,49 @@ export default function BiometricRecordsManager() {
       toast.error('Please select a child profile');
       return;
     }
-    if (!dataInput.trim()) {
-      toast.error('Please enter data for the record');
-      return;
-    }
 
     try {
-      const encoder = new TextEncoder();
-      const dataBytes = encoder.encode(dataInput.trim());
-      await addRecord.mutateAsync({
-        childId: selectedChildId,
-        dataType,
-        data: dataBytes,
-      });
+      if (recordType === 'biometric') {
+        if (!biometricInput.trim()) {
+          toast.error('Please enter biometric data');
+          return;
+        }
+        const encoder = new TextEncoder();
+        const dataBytes = encoder.encode(biometricInput.trim());
+        await addBiometricRecord.mutateAsync({
+          childId: selectedChildId,
+          dataType: 'biometric',
+          data: dataBytes,
+        });
+      } else {
+        if (touchSamples.length === 0) {
+          toast.error('Please capture touch samples first');
+          return;
+        }
+        await addTouchRecord.mutateAsync({
+          childId: selectedChildId,
+          samples: touchSamples,
+        });
+      }
       toast.success('Record added successfully');
-      setDataInput('');
+      setBiometricInput('');
+      setTouchSamples([]);
+      setIsCapturing(false);
       setAddDialogOpen(false);
     } catch (error: any) {
       toast.error(error.message || 'Failed to add record');
     }
   };
 
-  const handleDeleteRecord = async (recordId: bigint) => {
+  const handleDeleteRecord = async (record: UnifiedRecord) => {
     if (!selectedChildId) return;
 
     try {
-      await deleteRecord.mutateAsync({ recordId, childId: selectedChildId });
+      if (record.type === 'biometric') {
+        await deleteBiometricRecord.mutateAsync({ recordId: record.id, childId: selectedChildId });
+      } else {
+        await deleteTouchRecord.mutateAsync({ recordId: record.id, childId: selectedChildId });
+      }
       toast.success('Record deleted successfully');
     } catch (error: any) {
       toast.error(error.message || 'Failed to delete record');
@@ -94,12 +152,16 @@ export default function BiometricRecordsManager() {
   };
 
   const handleDeleteAll = async () => {
-    if (!selectedChildId || !records || records.length === 0) return;
+    if (!selectedChildId || unifiedRecords.length === 0) return;
 
     setDeletingAll(true);
     try {
-      for (const record of records) {
-        await deleteRecord.mutateAsync({ recordId: record.id, childId: selectedChildId });
+      for (const record of unifiedRecords) {
+        if (record.type === 'biometric') {
+          await deleteBiometricRecord.mutateAsync({ recordId: record.id, childId: selectedChildId });
+        } else {
+          await deleteTouchRecord.mutateAsync({ recordId: record.id, childId: selectedChildId });
+        }
       }
       toast.success('All records deleted successfully');
       setDeleteAllDialogOpen(false);
@@ -113,6 +175,15 @@ export default function BiometricRecordsManager() {
   const formatTimestamp = (timestamp: bigint) => {
     const date = new Date(Number(timestamp) / 1_000_000);
     return date.toLocaleString();
+  };
+
+  const handleDialogOpenChange = (open: boolean) => {
+    setAddDialogOpen(open);
+    if (!open) {
+      setBiometricInput('');
+      setTouchSamples([]);
+      setIsCapturing(false);
+    }
   };
 
   if (profilesLoading) {
@@ -137,7 +208,7 @@ export default function BiometricRecordsManager() {
             Biometric & Touch-Sensing Records
           </CardTitle>
           <CardDescription>
-            Manage guardian-entered biometric or touch-sensing data records for child profiles
+            Manage guardian-entered biometric data or capture raw numeric touch samples for child profiles
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -169,69 +240,103 @@ export default function BiometricRecordsManager() {
                     Records for: <span className="text-destructive">{selectedProfile?.name}</span>
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {records?.length || 0} record{records?.length !== 1 ? 's' : ''}
+                    {unifiedRecords.length} record{unifiedRecords.length !== 1 ? 's' : ''}
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  {records && records.length > 0 && (
+                  {unifiedRecords.length > 0 && (
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setDeleteAllDialogOpen(true)}
-                      disabled={deleteRecord.isPending || deletingAll}
+                      disabled={deleteBiometricRecord.isPending || deleteTouchRecord.isPending || deletingAll}
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
                       Delete All
                     </Button>
                   )}
-                  <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+                  <Dialog open={addDialogOpen} onOpenChange={handleDialogOpenChange}>
                     <DialogTrigger asChild>
                       <Button size="sm">
                         <Plus className="w-4 h-4 mr-2" />
                         Add Record
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="max-w-lg">
                       <DialogHeader>
                         <DialogTitle>Add Biometric/Touch-Sensing Record</DialogTitle>
                         <DialogDescription>
-                          Enter data for {selectedProfile?.name}. This data is stored as guardian-managed records.
+                          {recordType === 'biometric'
+                            ? `Enter biometric data for ${selectedProfile?.name}. This data is stored as guardian-managed records.`
+                            : `Capture raw numeric touch samples for ${selectedProfile?.name} by interacting with the capture pad below.`}
                         </DialogDescription>
                       </DialogHeader>
                       <form onSubmit={handleAddRecord} className="space-y-4">
                         <div className="space-y-2">
-                          <Label>Data Type</Label>
-                          <RadioGroup value={dataType} onValueChange={(v) => setDataType(v as any)}>
+                          <Label>Record Type</Label>
+                          <RadioGroup
+                            value={recordType}
+                            onValueChange={(v) => {
+                              setRecordType(v as RecordType);
+                              setIsCapturing(false);
+                              setTouchSamples([]);
+                            }}
+                          >
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="biometric" id="biometric" />
-                              <Label htmlFor="biometric" className="font-normal cursor-pointer">
-                                Biometric
+                              <Label htmlFor="biometric" className="font-normal cursor-pointer flex items-center gap-2">
+                                <Fingerprint className="w-4 h-4" />
+                                Biometric (text-based)
                               </Label>
                             </div>
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="touch-sensing" id="touch-sensing" />
-                              <Label htmlFor="touch-sensing" className="font-normal cursor-pointer">
-                                Touch-Sensing
+                              <Label
+                                htmlFor="touch-sensing"
+                                className="font-normal cursor-pointer flex items-center gap-2"
+                              >
+                                <Hand className="w-4 h-4" />
+                                Touch-Sensing (numeric samples)
                               </Label>
                             </div>
                           </RadioGroup>
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="dataInput">Data</Label>
-                          <Input
-                            id="dataInput"
-                            placeholder="Enter data (text representation)"
-                            value={dataInput}
-                            onChange={(e) => setDataInput(e.target.value)}
-                            autoFocus
-                          />
-                          <p className="text-xs text-muted-foreground">
-                            Note: This is a text representation stored by the guardian. No actual device biometrics are
-                            captured.
-                          </p>
-                        </div>
-                        <Button type="submit" className="w-full" disabled={addRecord.isPending}>
-                          {addRecord.isPending ? 'Adding...' : 'Add Record'}
+
+                        {recordType === 'biometric' ? (
+                          <div className="space-y-2">
+                            <Label htmlFor="biometricInput">Biometric Data</Label>
+                            <Input
+                              id="biometricInput"
+                              placeholder="Enter biometric data"
+                              value={biometricInput}
+                              onChange={(e) => setBiometricInput(e.target.value)}
+                              autoFocus
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              Note: This is a text representation stored by the guardian. No actual device biometrics
+                              are captured.
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            <TouchCapturePad onSamplesCollected={setTouchSamples} isCapturing={isCapturing} />
+                            <Button
+                              type="button"
+                              variant={isCapturing ? 'destructive' : 'secondary'}
+                              className="w-full"
+                              onClick={() => setIsCapturing(!isCapturing)}
+                            >
+                              {isCapturing ? 'Stop Capturing' : 'Start Capturing'}
+                            </Button>
+                          </div>
+                        )}
+
+                        <Button
+                          type="submit"
+                          className="w-full"
+                          disabled={addBiometricRecord.isPending || addTouchRecord.isPending}
+                        >
+                          {addBiometricRecord.isPending || addTouchRecord.isPending ? 'Adding...' : 'Add Record'}
                         </Button>
                       </form>
                     </DialogContent>
@@ -245,15 +350,25 @@ export default function BiometricRecordsManager() {
                     <Loader2 className="w-5 h-5 animate-spin" />
                     Loading records...
                   </div>
-                ) : records && records.length > 0 ? (
+                ) : unifiedRecords.length > 0 ? (
                   <div className="divide-y divide-border">
-                    {records.map((record) => (
-                      <div key={record.id.toString()} className="p-4 hover:bg-accent/50 transition-colors">
+                    {unifiedRecords.map((record) => (
+                      <div key={`${record.type}-${record.id.toString()}`} className="p-4 hover:bg-accent/50 transition-colors">
                         <div className="flex items-start justify-between">
                           <div className="space-y-1 flex-1">
                             <div className="flex items-center gap-2">
-                              <Badge variant={record.dataType === 'biometric' ? 'default' : 'secondary'}>
-                                {record.dataType}
+                              <Badge variant={record.type === 'biometric' ? 'default' : 'secondary'}>
+                                {record.type === 'biometric' ? (
+                                  <span className="flex items-center gap-1">
+                                    <Fingerprint className="w-3 h-3" />
+                                    Biometric
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center gap-1">
+                                    <Hand className="w-3 h-3" />
+                                    Touch-Sensing
+                                  </span>
+                                )}
                               </Badge>
                               <span className="text-xs text-muted-foreground">ID: {record.id.toString()}</span>
                             </div>
@@ -261,14 +376,16 @@ export default function BiometricRecordsManager() {
                               Created: {formatTimestamp(record.timestamp)}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              Data size: {record.data.length} bytes
+                              {record.type === 'biometric'
+                                ? `Data size: ${record.dataSize} bytes`
+                                : `Samples: ${record.dataSize}`}
                             </p>
                           </div>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDeleteRecord(record.id)}
-                            disabled={deleteRecord.isPending}
+                            onClick={() => handleDeleteRecord(record)}
+                            disabled={deleteBiometricRecord.isPending || deleteTouchRecord.isPending}
                           >
                             <Trash2 className="w-4 h-4 text-destructive" />
                           </Button>
@@ -300,8 +417,8 @@ export default function BiometricRecordsManager() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete All Records?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete all {records?.length || 0} record{records?.length !== 1 ? 's' : ''} for{' '}
-              {selectedProfile?.name}. This action cannot be undone.
+              This will permanently delete all {unifiedRecords.length} record{unifiedRecords.length !== 1 ? 's' : ''}{' '}
+              for {selectedProfile?.name}. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

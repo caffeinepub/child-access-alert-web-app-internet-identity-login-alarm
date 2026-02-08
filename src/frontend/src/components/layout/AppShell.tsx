@@ -31,11 +31,11 @@ export default function AppShell() {
             >
               <img
                 src="/assets/generated/alarm-bell-icon.dim_512x512.png"
-                alt="Child Access Alert"
+                alt="Child Access Control"
                 className="w-10 h-10"
               />
               <div className="flex flex-col items-start">
-                <h1 className="text-xl font-bold text-foreground">Child Access Alert</h1>
+                <h1 className="text-xl font-bold text-foreground">Child Access Control</h1>
                 <p className="text-xs text-muted-foreground">Guardian Protection System</p>
               </div>
             </button>

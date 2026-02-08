@@ -1,69 +1,70 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T06:22:46.855Z",
+  "generatedAt": "2026-02-08T07:00:08.325Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 3,
-    "implemented": 2,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-10",
-        "summary": "Add backend data models and stable-state storage to associate \"biometric data\" and/or \"touch-sensing data\" records with a specific child profile, with guardian-only authorization for create/read/delete operations.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-11",
-        "summary": "Implement frontend UI in the Guardian Dashboard to manage stored biometric/touch-sensing data per child profile, including adding a new record, listing existing records, and deleting records (guardian-only).",
+        "id": "REQ-17",
+        "summary": "Add a production publishing checklist and deployment steps document that explains how to deploy the backend canister and the frontend assets to the Internet Computer, including how to configure a custom domain and the exact domain slug constraints (5–50 chars; letters, numbers, hyphens only).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/queries/useBiometricRecords.ts",
-          "frontend/src/components/Guardian/BiometricRecordsManager.tsx",
-          "frontend/src/pages/Dashboard.tsx"
+          "frontend/DEPLOYMENT.md"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/queries/useBiometricRecords.ts",
-          "frontend/src/components/Guardian/BiometricRecordsManager.tsx",
-          "frontend/src/pages/Dashboard.tsx"
+          "frontend/DEPLOYMENT.md"
         ]
       },
       {
-        "id": "REQ-12",
-        "summary": "Update user-facing copy to remove existing claims that the app does not collect/store biometric data, and instead accurately describe what biometric/touch-sensing data is stored, who can manage it, and the web-app limitations around device-level touch detection.",
+        "id": "REQ-18",
+        "summary": "Update user-facing app metadata to reflect the new app name \"Child Access Control\" consistently where it appears in the UI and page metadata, without using invalid domain characters.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/LimitationsPrivacy.tsx",
+          "frontend/index.html",
+          "frontend/src/components/layout/AppShell.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/index.html",
+          "frontend/src/components/layout/AppShell.tsx"
+        ]
+      },
+      {
+        "id": "REQ-19",
+        "summary": "Ensure the frontend routing and asset paths work correctly when the app is served from a custom domain over HTTPS, including direct navigation to routes like /dashboard, /alarm, and /limitations and loading generated assets from /assets/generated.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/App.tsx",
+          "frontend/public/404.html",
+          "frontend/public/assets/generated/alarm-bell-icon.dim_512x512.png",
+          "frontend/public/assets/generated/phone-alert-illustration.dim_1200x600.png",
+          "frontend/src/components/layout/AppShell.tsx",
           "frontend/src/pages/Landing.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/LimitationsPrivacy.tsx",
-          "frontend/src/pages/Landing.tsx"
+          "frontend/src/App.tsx",
+          "frontend/public/404.html",
+          "frontend/src/components/layout/AppShell.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
-    "build-template/README.md",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/Guardian/BiometricRecordsManager.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/queries/useBiometricRecords.ts",
-    "frontend/src/pages/Dashboard.tsx",
-    "frontend/src/pages/Landing.tsx",
-    "frontend/src/pages/LimitationsPrivacy.tsx",
+    "frontend/DEPLOYMENT.md",
+    "frontend/index.html",
+    "frontend/public/404.html",
+    "frontend/src/App.tsx",
+    "frontend/src/components/layout/AppShell.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
