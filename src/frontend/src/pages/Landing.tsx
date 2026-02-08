@@ -49,7 +49,7 @@ export default function Landing() {
                   <div>
                     <h3 className="font-semibold text-foreground">Secure Sign-in (Internet Identity)</h3>
                     <p className="text-sm text-muted-foreground">
-                      Uses device authentication without collecting biometric data
+                      Privacy-preserving authentication with device-level security
                     </p>
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export default function Landing() {
                 <div>
                   <h4 className="font-semibold text-foreground">Link Child Accounts</h4>
                   <p className="text-sm text-muted-foreground">
-                    Have each child sign in with Internet Identity, then link their account to their profile
+                    Connect Internet Identity principals to child profiles
                   </p>
                 </div>
               </div>
@@ -195,7 +195,18 @@ export default function Landing() {
                 <div>
                   <h4 className="font-semibold text-foreground">Automatic Alerts</h4>
                   <p className="text-sm text-muted-foreground">
-                    When a linked child accesses the app, an alarm triggers automatically
+                    When a linked child accesses the app, an alarm triggers immediately
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <div className="shrink-0 w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center text-destructive font-bold">
+                  4
+                </div>
+                <div>
+                  <h4 className="font-semibold text-foreground">Guardian Control</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Only guardians can stop the alarm by entering the correct PIN
                   </p>
                 </div>
               </div>

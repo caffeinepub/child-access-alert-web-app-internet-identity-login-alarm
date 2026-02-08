@@ -13,6 +13,13 @@ export interface AlarmEvent {
     timestamp: Time;
 }
 export type Time = bigint;
+export interface BiometricRecord {
+    id: bigint;
+    data: Uint8Array;
+    childId: string;
+    dataType: string;
+    timestamp: Time;
+}
 export interface UserProfile {
     name: string;
     role: string;
@@ -29,10 +36,13 @@ export enum UserRole {
 }
 export interface backendInterface {
     acknowledgeAlarm(): Promise<void>;
+    addBiometricRecord(childId: string, dataType: string, data: Uint8Array): Promise<bigint>;
     archiveChildProfile(id: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     createChildProfile(id: string, name: string): Promise<void>;
+    deleteBiometricRecord(recordId: bigint): Promise<void>;
     getAlarmEvents(): Promise<Array<AlarmEvent>>;
+    getBiometricRecordsForChild(childId: string): Promise<Array<BiometricRecord>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getChildProfiles(): Promise<Array<ChildProfile>>;

@@ -19,6 +19,13 @@ export const AlarmEvent = IDL.Record({
   'acknowledged' : IDL.Bool,
   'timestamp' : Time,
 });
+export const BiometricRecord = IDL.Record({
+  'id' : IDL.Nat,
+  'data' : IDL.Vec(IDL.Nat8),
+  'childId' : IDL.Text,
+  'dataType' : IDL.Text,
+  'timestamp' : Time,
+});
 export const UserProfile = IDL.Record({ 'name' : IDL.Text, 'role' : IDL.Text });
 export const ChildProfile = IDL.Record({
   'id' : IDL.Text,
@@ -29,10 +36,21 @@ export const ChildProfile = IDL.Record({
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'acknowledgeAlarm' : IDL.Func([], [], []),
+  'addBiometricRecord' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Vec(IDL.Nat8)],
+      [IDL.Nat],
+      [],
+    ),
   'archiveChildProfile' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createChildProfile' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'deleteBiometricRecord' : IDL.Func([IDL.Nat], [], []),
   'getAlarmEvents' : IDL.Func([], [IDL.Vec(AlarmEvent)], ['query']),
+  'getBiometricRecordsForChild' : IDL.Func(
+      [IDL.Text],
+      [IDL.Vec(BiometricRecord)],
+      ['query'],
+    ),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getChildProfiles' : IDL.Func([], [IDL.Vec(ChildProfile)], ['query']),
@@ -67,6 +85,13 @@ export const idlFactory = ({ IDL }) => {
     'acknowledged' : IDL.Bool,
     'timestamp' : Time,
   });
+  const BiometricRecord = IDL.Record({
+    'id' : IDL.Nat,
+    'data' : IDL.Vec(IDL.Nat8),
+    'childId' : IDL.Text,
+    'dataType' : IDL.Text,
+    'timestamp' : Time,
+  });
   const UserProfile = IDL.Record({ 'name' : IDL.Text, 'role' : IDL.Text });
   const ChildProfile = IDL.Record({
     'id' : IDL.Text,
@@ -77,10 +102,21 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'acknowledgeAlarm' : IDL.Func([], [], []),
+    'addBiometricRecord' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Vec(IDL.Nat8)],
+        [IDL.Nat],
+        [],
+      ),
     'archiveChildProfile' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createChildProfile' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'deleteBiometricRecord' : IDL.Func([IDL.Nat], [], []),
     'getAlarmEvents' : IDL.Func([], [IDL.Vec(AlarmEvent)], ['query']),
+    'getBiometricRecordsForChild' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(BiometricRecord)],
+        ['query'],
+      ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getChildProfiles' : IDL.Func([], [IDL.Vec(ChildProfile)], ['query']),

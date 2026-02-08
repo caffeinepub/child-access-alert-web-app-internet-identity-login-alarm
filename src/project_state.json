@@ -1,15 +1,16 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 3,
-  "summary": "Mobile app that detects when a child under 13 touches/uses the phone, recognizes the child via biometrics, and triggers an alert/ringing.",
+  "projectStateVersion": 5,
+  "summary": "Mobile app/web app concept that aims to detect child (under 13) phone use/touch, identify the child (potentially via biometrics), and trigger an alert/ringing, with the new requirement to store biometric data and/or touch-sensing data.",
   "architectural_notes": [
-    "Use device biometric authentication/face recognition capabilities (where available) to identify the child and trigger an audible alert when detected."
+    "Use device biometric authentication/face recognition capabilities (where available) to identify the child and trigger an audible alert when detected.",
+    "If biometric or touch-sensing data must be stored, define what data is collected, where it is stored (on-device vs backend), how it is encrypted, retention/deletion policy, and consent/guardian controls."
   ],
   "known_issues": [
-    "Biometric identification for children and apps targeting under-13 may have significant platform/policy/privacy constraints; requirements may need adjustment based on OS capabilities and child privacy regulations."
+    "Biometric identification for children and apps targeting under-13 may have significant platform/policy/privacy constraints; requirements may need adjustment based on OS capabilities and child privacy regulations.",
+    "Storing biometric data and/or raw touch-sensing data for under-13 users is likely to be prohibited or heavily restricted by platform policies and child privacy laws; may require major scope change and legal/compliance review (or redesign to avoid storing such data)."
   ],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Minimal alarm bell app icon, flat vector style, high contrast (alarm-bell-icon.dim_512x512.png)\n- Simple illustration of a phone with an alert wave/ring effect, clean minimal style (phone-alert-illustration.dim_1200x600.png)",
   "existing_features": [
     {
       "id": "feature-build-a-web-app-that-triggers-a-loud-on-screen-alarm-ringing-state-when-a-child-accesses-the-app-and-logs-each-access-event-timestamp-identified-child-profile-for-a-parent-guardian-to-review",
@@ -74,6 +75,22 @@
         "REQ-9"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-implement-frontend-ui-in-the-guardian-dashboard-to-manage-stored-biometric-touch-sensing-data-per-child-profile-including-adding-a-new-record-listing-existing-records-and-deleting-records-guardian-only",
+      "title": "Implement frontend UI in the Guardian Dashboard to manage stored biometric/touch-sensing data per child profile, including adding a new record, listing existing records, and deleting records (guardian-only).",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-user-facing-copy-to-remove-existing-claims-that-the-app-does-not-collect-store-biometric-data-and-instead-accurately-describe-what-biometric-touch-sensing-data-is-stored-who-can-manage-it-and-the-web-app-limitations-around-device-level-touch-detection",
+      "title": "Update user-facing copy to remove existing claims that the app does not collect/store biometric data, and instead accurately describe what biometric/touch-sensing data is stored, who can manage it, and the web-app limitations around device-level touch detection.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -88,6 +105,20 @@
       "summary": "Implement Motoko backend APIs and stable storage for: guardian PIN hash, child profiles, principal-to-profile links, and access/alarm event logs.",
       "reqIds": [
         "REQ-7"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Store biometric data and/or touch-sensing data for the child to support identification/detection.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Add backend data models and stable-state storage to associate \"biometric data\" and/or \"touch-sensing data\" records with a specific child profile, with guardian-only authorization for create/read/delete operations.",
+      "reqIds": [
+        "REQ-10"
       ],
       "status": "pending"
     }

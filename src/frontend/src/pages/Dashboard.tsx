@@ -6,6 +6,7 @@ import ChildProfilesManager from '../components/Guardian/ChildProfilesManager';
 import PrincipalLinkingPanel from '../components/Guardian/PrincipalLinkingPanel';
 import GuardianPinSettings from '../components/Guardian/GuardianPinSettings';
 import AlarmEventLog from '../components/Guardian/AlarmEventLog';
+import BiometricRecordsManager from '../components/Guardian/BiometricRecordsManager';
 
 export default function Dashboard() {
   const { data: userRole, isLoading } = useGetCallerUserRole();
@@ -51,8 +52,9 @@ export default function Dashboard() {
         </div>
 
         <Tabs defaultValue="profiles" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="profiles">Profiles</TabsTrigger>
+            <TabsTrigger value="records">Records</TabsTrigger>
             <TabsTrigger value="linking">Link Accounts</TabsTrigger>
             <TabsTrigger value="logs">Event Logs</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -60,6 +62,10 @@ export default function Dashboard() {
 
           <TabsContent value="profiles" className="space-y-6">
             <ChildProfilesManager />
+          </TabsContent>
+
+          <TabsContent value="records" className="space-y-6">
+            <BiometricRecordsManager />
           </TabsContent>
 
           <TabsContent value="linking" className="space-y-6">

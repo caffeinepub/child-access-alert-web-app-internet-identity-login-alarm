@@ -15,6 +15,13 @@ export interface AlarmEvent {
   'acknowledged' : boolean,
   'timestamp' : Time,
 }
+export interface BiometricRecord {
+  'id' : bigint,
+  'data' : Uint8Array,
+  'childId' : string,
+  'dataType' : string,
+  'timestamp' : Time,
+}
 export interface ChildProfile {
   'id' : string,
   'name' : string,
@@ -28,10 +35,13 @@ export type UserRole = { 'admin' : null } |
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'acknowledgeAlarm' : ActorMethod<[], undefined>,
+  'addBiometricRecord' : ActorMethod<[string, string, Uint8Array], bigint>,
   'archiveChildProfile' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createChildProfile' : ActorMethod<[string, string], undefined>,
+  'deleteBiometricRecord' : ActorMethod<[bigint], undefined>,
   'getAlarmEvents' : ActorMethod<[], Array<AlarmEvent>>,
+  'getBiometricRecordsForChild' : ActorMethod<[string], Array<BiometricRecord>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getChildProfiles' : ActorMethod<[], Array<ChildProfile>>,

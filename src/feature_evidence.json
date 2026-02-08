@@ -2,13 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-build-a-web-app-that-triggers-a-loud-on-screen-alarm-ringing-state-when-a-child-accesses-the-app-and-logs-each-access-event-timestamp-identified-child-profile-for-a-parent-guardian-to-review",
-      "featureTitle": "Build a web app that triggers a loud on-screen alarm/ringing state when a child accesses the app, and logs each access event (timestamp + identified child profile) for a parent/guardian to review.",
+      "featureId": "feature-implement-frontend-ui-in-the-guardian-dashboard-to-manage-stored-biometric-touch-sensing-data-per-child-profile-including-adding-a-new-record-listing-existing-records-and-deleting-records-guardian-only",
+      "featureTitle": "Implement frontend UI in the Guardian Dashboard to manage stored biometric/touch-sensing data per child profile, including adding a new record, listing existing records, and deleting records (guardian-only).",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/hooks/queries/useAlarm.ts",
-        "frontend/src/hooks/queries/useAlarmEvents.ts",
-        "frontend/src/pages/Alarm.tsx",
+        "frontend/src/components/Guardian/BiometricRecordsManager.tsx",
+        "frontend/src/hooks/queries/useBiometricRecords.ts",
         "frontend/src/pages/Dashboard.tsx"
       ],
       "components": [
@@ -20,129 +18,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-1"
+        "REQ-11"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-identity-recognition-using-internet-identity-webauthn-as-the-authentication-mechanism-and-map-authenticated-principals-to-child-profiles-created-by-the-guardian-no-collection-or-storage-of-biometric-data",
-      "featureTitle": "Implement identity recognition using Internet Identity (WebAuthn) as the authentication mechanism, and map authenticated principals to child profiles created by the guardian (no collection or storage of biometric data).",
+      "featureId": "feature-update-user-facing-copy-to-remove-existing-claims-that-the-app-does-not-collect-store-biometric-data-and-instead-accurately-describe-what-biometric-touch-sensing-data-is-stored-who-can-manage-it-and-the-web-app-limitations-around-device-level-touch-detection",
+      "featureTitle": "Update user-facing copy to remove existing claims that the app does not collect/store biometric data, and instead accurately describe what biometric/touch-sensing data is stored, who can manage it, and the web-app limitations around device-level touch detection.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/Auth/LoginButton.tsx",
-        "frontend/src/components/Auth/ProfileSetupModal.tsx",
-        "frontend/src/hooks/queries/useCurrentUser.ts",
-        "frontend/src/pages/Landing.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-provide-a-guardian-dashboard-to-manage-child-profiles-create-rename-archive-and-link-unlink-each-profile-to-an-internet-identity-principal",
-      "featureTitle": "Provide a guardian dashboard to manage child profiles (create, rename, archive) and link/unlink each profile to an Internet Identity principal.",
-      "files": [
-        "frontend/src/components/Guardian/ChildProfilesManager.tsx",
-        "frontend/src/components/Guardian/PrincipalLinkingPanel.tsx",
-        "frontend/src/hooks/queries/useChildProfiles.ts",
-        "frontend/src/hooks/queries/usePrincipalLinks.ts",
-        "frontend/src/pages/Dashboard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-guardian-only-control-to-stop-acknowledge-an-active-alarm-using-a-simple-guardian-pin-stored-securely-in-backend-state-hashed-and-verified-server-side",
-      "featureTitle": "Add a guardian-only control to stop/acknowledge an active alarm using a simple guardian PIN stored securely in backend state (hashed) and verified server-side.",
-      "files": [
-        "frontend/src/components/Alarm/PinAcknowledgeForm.tsx",
-        "frontend/src/components/Guardian/GuardianPinSettings.tsx",
-        "frontend/src/hooks/queries/useGuardianPin.ts",
-        "frontend/src/pages/Alarm.tsx",
-        "frontend/src/pages/Dashboard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-define-a-clear-consistent-visual-theme-for-the-app-colors-typography-spacing-layout-suitable-for-a-safety-alert-product-avoiding-blue-purple-as-primary-colors-and-apply-it-across-all-screens",
-      "featureTitle": "Define a clear, consistent visual theme for the app (colors, typography, spacing, layout) suitable for a safety/alert product, avoiding blue/purple as primary colors, and apply it across all screens.",
-      "files": [
-        "frontend/src/components/layout/AppShell.tsx",
-        "frontend/src/index.css",
-        "frontend/src/pages/Alarm.tsx",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-core-screens-in-the-react-ui-1-landing-sign-in-2-guardian-dashboard-profiles-logs-3-alarm-screen-state-and-wire-them-to-backend-apis-with-react-query",
-      "featureTitle": "Create core screens in the React UI: (1) Landing/sign-in, (2) Guardian dashboard (profiles + logs), (3) Alarm screen/state, and wire them to backend APIs with React Query.",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/hooks/useActor.ts",
-        "frontend/src/pages/Dashboard.tsx",
-        "frontend/src/pages/Landing.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-an-in-app-limitations-privacy-page-in-english-that-explains-this-is-a-web-app-it-cannot-detect-raw-phone-touches-it-does-not-collect-biometrics-and-it-is-intended-for-guardian-managed-use-for-children-under-13",
-      "featureTitle": "Add an in-app “Limitations & Privacy” page in English that explains: this is a web app, it cannot detect raw phone touches, it does not collect biometrics, and it is intended for guardian-managed use for children under 13.",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/layout/AppShell.tsx",
+        "frontend/src/pages/Landing.tsx",
         "frontend/src/pages/LimitationsPrivacy.tsx"
       ],
       "components": [
@@ -154,27 +38,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-8"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-generate-and-include-required-static-images-icon-simple-illustration-in-the-frontend-and-use-them-in-the-ui-e-g-app-icon-in-header-illustration-on-landing-store-them-under-frontend-public-assets-generated",
-      "featureTitle": "Generate and include required static images (icon + simple illustration) in the frontend and use them in the UI (e.g., app icon in header, illustration on landing). Store them under frontend/public/assets/generated.",
-      "files": [
-        "frontend/src/components/layout/AppShell.tsx",
-        "frontend/src/pages/Landing.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-9"
+        "REQ-12"
       ],
       "confidence": "high"
     }

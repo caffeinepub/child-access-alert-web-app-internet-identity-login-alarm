@@ -49,30 +49,40 @@ export default function LimitationsPrivacy() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="w-5 h-5 text-destructive" />
-                Privacy & Biometric Data
+                Privacy & Data Storage
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                <strong>This app does NOT collect, store, or process any biometric data.</strong>
+                <strong>Guardian-Managed Records:</strong> This app allows guardians to store records labeled as
+                "biometric" or "touch-sensing" data tied to child profiles. These records are explicitly entered by
+                guardians within the app.
               </p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                 <li>
-                  <strong>No fingerprints:</strong> We do not capture or store fingerprint scans or templates.
+                  <strong>No device biometrics captured:</strong> This web app does not and cannot capture fingerprint
+                  scans, facial recognition data, or any device-level biometric information. Web browsers do not expose
+                  such data to web applications.
                 </li>
                 <li>
-                  <strong>No facial recognition:</strong> We do not capture or store facial images or facial
-                  recognition data.
+                  <strong>No automatic touch detection:</strong> The app cannot perform OS-level or system-wide touch
+                  detection. It only stores data that guardians explicitly provide within the app interface.
                 </li>
                 <li>
-                  <strong>No biometric templates:</strong> We do not create, store, or process any biometric templates
-                  or identifiers.
+                  <strong>Guardian responsibility:</strong> Guardians are solely responsible for the data they choose to
+                  enter and store. This app provides storage functionality but does not validate, process, or analyze
+                  the stored data.
+                </li>
+                <li>
+                  <strong>No compliance guarantees:</strong> This app is provided as-is for educational and
+                  demonstration purposes. It does not claim compliance with any biometric data regulations (e.g., BIPA,
+                  GDPR, CCPA). Guardians must ensure their use complies with applicable laws.
                 </li>
               </ul>
               <p className="text-muted-foreground">
-                Instead, this app uses <strong>Internet Identity</strong>, which is a privacy-preserving authentication
-                system. Internet Identity may use your device's built-in authentication (like Face ID or Touch ID) to
-                verify it's you, but:
+                <strong>Internet Identity Authentication:</strong> This app uses Internet Identity, a
+                privacy-preserving authentication system. Internet Identity may use your device's built-in
+                authentication (like Face ID or Touch ID) to verify it's you, but:
               </p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                 <li>Your biometric data never leaves your device</li>
@@ -96,7 +106,7 @@ export default function LimitationsPrivacy() {
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                 <li>
                   <strong>Guardian control:</strong> Only guardians (parents/caregivers) should set up and manage child
-                  profiles.
+                  profiles and any associated records.
                 </li>
                 <li>
                   <strong>Supervised use:</strong> This app is intended for supervised environments where guardians
@@ -108,7 +118,7 @@ export default function LimitationsPrivacy() {
                 </li>
                 <li>
                   <strong>Educational purpose:</strong> This app is primarily for demonstration and educational purposes
-                  to show how access alerts could work in a controlled environment.
+                  to show how access alerts and guardian-managed records could work in a controlled environment.
                 </li>
               </ul>
             </CardContent>
@@ -128,6 +138,10 @@ export default function LimitationsPrivacy() {
                   <strong>Child profiles:</strong> Only display names chosen by guardians (no personal information)
                 </li>
                 <li>
+                  <strong>Guardian-entered records:</strong> Text-based records labeled as "biometric" or
+                  "touch-sensing" that guardians explicitly enter and manage
+                </li>
+                <li>
                   <strong>Access logs:</strong> Timestamps and which child profile triggered an alarm
                 </li>
                 <li>
@@ -140,7 +154,7 @@ export default function LimitationsPrivacy() {
               </ul>
               <p className="text-muted-foreground">
                 We do not collect email addresses, phone numbers, real names, or any other personally identifiable
-                information beyond what you choose to provide as display names.
+                information beyond what you choose to provide as display names or guardian-entered records.
               </p>
             </CardContent>
           </Card>

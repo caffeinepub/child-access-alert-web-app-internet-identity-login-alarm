@@ -8,14 +8,17 @@ import Int "mo:core/Int";
 import Order "mo:core/Order";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
+import Migration "migration";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
+// Use migration function on upgrade
+(with migration = Migration.run)
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // User profile type as required by instructions
+  // User profile type
   public type UserProfile = {
     name : Text;
     role : Text; // "guardian" or "child"
@@ -45,6 +48,14 @@ actor {
     };
   };
 
+  type BiometricRecord = {
+    id : Nat;
+    childId : Text;
+    dataType : Text; // "fingerprint", "face", etc.
+    data : [Nat8]; // Raw encoded data
+    timestamp : Time.Time;
+  };
+
   // Persistent state
   var guardianPinHash : ?Text = null; // Stores PIN hash (placeholder for actual hash in runtime environment)
   let childProfiles = Map.empty<Text, ChildProfile>();
@@ -53,8 +64,10 @@ actor {
   var eventCounter : Nat = 0;
   var alarmActive : Bool = false;
   let userProfiles = Map.empty<Principal, UserProfile>();
+  let biometricRecords = Map.empty<Nat, BiometricRecord>();
+  var biometricRecordCounter : Nat = 0;
 
-  // Required user profile functions
+  // User profile functions
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view profiles");
@@ -81,7 +94,6 @@ actor {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Admin only");
     };
-    // In root-system, this should use SHA256 hashing. Here, we store the text as-is.
     guardianPinHash := ?pin;
   };
 
@@ -206,7 +218,6 @@ actor {
   };
 
   public query ({ caller }) func isAlarmActive() : async Bool {
-    // Any authenticated user can check alarm status
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can check alarm status");
     };
@@ -214,13 +225,54 @@ actor {
   };
 
   public query ({ caller }) func getLinkedChildProfile() : async ?ChildProfile {
-    // Allow any authenticated user to check their linked profile
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can check linked profile");
     };
     switch (principalToChild.get(caller)) {
       case (null) { null };
       case (?childId) { childProfiles.get(childId) };
+    };
+  };
+
+  // NEW: Biometric record management
+  public shared ({ caller }) func addBiometricRecord(childId : Text, dataType : Text, data : [Nat8]) : async Nat {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Guardian only");
+    };
+
+    let record : BiometricRecord = {
+      id = biometricRecordCounter;
+      childId;
+      dataType;
+      data;
+      timestamp = Time.now();
+    };
+
+    biometricRecords.add(biometricRecordCounter, record);
+    biometricRecordCounter += 1;
+    record.id;
+  };
+
+  public query ({ caller }) func getBiometricRecordsForChild(childId : Text) : async [BiometricRecord] {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Guardian only");
+    };
+
+    biometricRecords.values().toArray().filter(
+      func(record) { record.childId == childId }
+    );
+  };
+
+  public shared ({ caller }) func deleteBiometricRecord(recordId : Nat) : async () {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Guardian only");
+    };
+
+    let success = biometricRecords.containsKey(recordId);
+    biometricRecords.remove(recordId);
+
+    if (not success) {
+      Runtime.trap("Record not found");
     };
   };
 };
